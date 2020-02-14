@@ -7,7 +7,7 @@ Desktop application for the shape of hanging cable among multiple support points
 
    ![MainScreen](JA-CatenarySpans-scr2.png)
    
-  - Span Details
+ - Span Details
 
    ![Details](JA-CatenarySpans-scr3.png)
    
