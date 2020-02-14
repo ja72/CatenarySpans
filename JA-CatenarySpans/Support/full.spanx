@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<RulingSpan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" UnitSymbols="(lbm,lbf,ft,s)">
+  <Spans>
+    <Catenary StartX="0" StartY="90" SpanX="400" SpanY="0" Weight="0.74999999999999989" HorizontalTension="3654.9219196430472" />
+    <Catenary StartX="400" StartY="90" SpanX="1400" SpanY="0" Weight="0.74999999999999989" HorizontalTension="3654.9219196430472" />
+    <Catenary StartX="1800" StartY="90" SpanX="700" SpanY="0" Weight="0.74999999999999989" HorizontalTension="3654.9219196430472" />
+    <Catenary StartX="2500" StartY="90" SpanX="600" SpanY="0" Weight="0.74999999999999989" HorizontalTension="3654.9219196430472" />
+    <Catenary StartX="3100" StartY="90" SpanX="1650" SpanY="0" Weight="0.74999999999999989" HorizontalTension="3654.9219196430472" />
+    <Catenary StartX="4750" StartY="90" SpanX="845" SpanY="0" Weight="0.74999999999999989" HorizontalTension="3654.9219196430472" />
+    <Catenary StartX="5595" StartY="90" SpanX="1480" SpanY="0" Weight="0.74999999999999989" HorizontalTension="3654.9219196430472" />
+  </Spans>
+</RulingSpan>

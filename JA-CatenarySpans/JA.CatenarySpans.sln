@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1000
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JA.CatenarySpans", "JA.CatenarySpans.csproj", "{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JA-CatenarySpans-Tests", "..\JA-CatenarySpans-Tests\JA-CatenarySpans-Tests.csproj", "{6FFDB134-F46E-47DE-BFFE-11DDD92B6265}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}.Debug|x86.ActiveCfg = Debug|x86
+		{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}.Debug|x86.Build.0 = Debug|x86
+		{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}.Release|x86.ActiveCfg = Release|x86
+		{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}.Release|x86.Build.0 = Release|x86
+		{6FFDB134-F46E-47DE-BFFE-11DDD92B6265}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FFDB134-F46E-47DE-BFFE-11DDD92B6265}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FFDB134-F46E-47DE-BFFE-11DDD92B6265}.Debug|x86.ActiveCfg = Debug|x86
+		{6FFDB134-F46E-47DE-BFFE-11DDD92B6265}.Debug|x86.Build.0 = Debug|x86
+		{6FFDB134-F46E-47DE-BFFE-11DDD92B6265}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FFDB134-F46E-47DE-BFFE-11DDD92B6265}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FFDB134-F46E-47DE-BFFE-11DDD92B6265}.Release|x86.ActiveCfg = Release|x86
+		{6FFDB134-F46E-47DE-BFFE-11DDD92B6265}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94420C99-4396-4E93-B84C-5A6678E893E8}
+	EndGlobalSection
+EndGlobal

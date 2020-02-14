@@ -1,0 +1,356 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JA</RootNamespace>
+    <AssemblyName>JA-CatenarySpans</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ProductName>Catenary Spans</ProductName>
+    <PublisherName>John Alexiou</PublisherName>
+    <AutorunEnabled>true</AutorunEnabled>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>ja.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArrayEx.cs" />
+    <Compile Include="ComponentLicense.cs" />
+    <Compile Include="ComponentLicenseProvider.cs" />
+    <Compile Include="CRC.cs" />
+    <Compile Include="Engineering\ItemList.cs" />
+    <Compile Include="CatenarySpans\CatenaryTable.cs" />
+    <Compile Include="Engineering\Cable.cs" />
+    <Compile Include="Engineering\CableChart.cs" />
+    <Compile Include="Engineering\CatenaryCalculator.cs" />
+    <Compile Include="Double.cs" />
+    <Compile Include="Engineering\Catenary.cs" />
+    <Compile Include="CatenarySpans\CatenaryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CatenarySpans\CatenaryForm.Designer.cs">
+      <DependentUpon>CatenaryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CatenarySpans\CatenaryGraphics.cs" />
+    <Compile Include="Engineering\EngValue.cs" />
+    <Compile Include="Engineering\ProjectUnits.cs" />
+    <Compile Include="Engineering\RulingSpan.cs" />
+    <Compile Include="Engineering\SagAndTension.cs" />
+    <Compile Include="Engineering\StrandGroup.cs" />
+    <Compile Include="Engineering\Loading.cs" />
+    <Compile Include="Engineering\Material.cs" />
+    <Compile Include="Engineering\Span.cs" />
+    <Compile Include="Engineering\StrandedCable.cs" />
+    <Compile Include="Engineering\StressCurves.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Engineering\Unit.cs" />
+    <Compile Include="Ex.cs" />
+    <Compile Include="Functions.cs" />
+    <Compile Include="Gdi\Colors.cs" />
+    <Compile Include="Gdi\Canvas.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IntRange.cs" />
+    <Compile Include="Printing\Printables.cs" />
+    <Compile Include="Printing\PrintDoc.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Printing\PrintPreviewAndSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Printing\PrintPreviewAndSettings.designer.cs">
+      <DependentUpon>PrintPreviewAndSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CatenarySpans\CatenaryForm.resx">
+      <DependentUpon>CatenaryForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Printing\PrintPreviewAndSettings.resx">
+      <DependentUpon>PrintPreviewAndSettings.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CatenarySpans\TensionForm.resx">
+      <DependentUpon>TensionForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Content Include="CatenaryForm.lic">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Engineering\CatebaryDiagram.cd" />
+    <None Include="ja.snk" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Gdi\Style.cs" />
+    <Compile Include="CatenarySpans\TensionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CatenarySpans\TensionForm.Designer.cs">
+      <DependentUpon>TensionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SagTensTests.cs" />
+    <Compile Include="Vector2.cs" />
+    <None Include="small_2.spanx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Support\Sag10_Compare.xls" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cross-small-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cross-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exclamation-small-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exclamation-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\information-small-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\information-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\minus-small-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\minus-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\navigation-000-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\navigation-090-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\navigation-180-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\navigation-270-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\plus-small-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\plus-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\question-small-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\question-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tick-small-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tick-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag--arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag-black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag-blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag--exclamation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag-gray.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag-green.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag--minus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag--plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag-yellow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\printer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\disk.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\disk-black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\blue-folder-horizontal-open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\blue-folder-open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\DataSources\JA.Engineering.Catenary.datasource" />
+    <None Include="Properties\DataSources\JA.Engineering.ProjectUnits.datasource" />
+    <None Include="Properties\DataSources\Vector2.datasource" />
+    <None Include="Resources\blue-folder-open-document.png" />
+    <Content Include="Chart2.ico" />
+    <Content Include="Support\drake.cablex">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Support\mks.spanx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Support\full.spanx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Support\small.spanx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <FileAssociation Include=".spanx">
+      <Visible>False</Visible>
+      <Description>Ruling Span Data</Description>
+      <Progid>1001</Progid>
+      <DefaultIcon>Chart2.ico</DefaultIcon>
+    </FileAssociation>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

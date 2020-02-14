@@ -1,0 +1,315 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="JA.Engineering.CatenaryCalculator">
+    <Position X="16.25" Y="1.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAgAAAGkAAAIIAABIjQAFkAAIAABAAAAAAoAAKIAIgA=</HashCode>
+      <FileName>Engineering\CatenaryCalculator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JA.Engineering.Catenary">
+    <Position X="8.5" Y="6.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAoSBBICQIgAAAAMGiwwEhQAYCAADoJEEAgAAEQJADI=</HashCode>
+      <FileName>Engineering\Catenary.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.Span">
+    <Position X="8.5" Y="1.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAJAAAQECiAAAAsqAiAIAAA0AAgABAAIAAAAQAQABA=</HashCode>
+      <FileName>Engineering\Span.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.RulingSpan">
+    <Position X="4.5" Y="3.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="JA.Engineering.RulingSpan.ItemChangeEventArgs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\RulingSpan.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AEAEAAAARwAAIWCIChEIQAgiIBAQAEhAFADiAAAFgBA=</HashCode>
+      <FileName>Engineering\RulingSpan.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Units" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Spans" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.Loading">
+    <Position X="4.5" Y="12" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>CAAAABAACAAAACAICAAQIAAAAAAABACAQCYAAAAEADI=</HashCode>
+      <FileName>Engineering\Loading.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.DesignLoad">
+    <Position X="8.5" Y="12.25" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAJAAAACAAAAIAAAAAQAAAAEAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Engineering\Loading.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Condition" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.ProjectUnits">
+    <Position X="0.5" Y="6" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="JA.Engineering.ProjectUnits.UnitsTypeConverter" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\ProjectUnits.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="JA.Engineering.ProjectUnits.SetEventArgs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\ProjectUnits.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="JA.Engineering.ProjectUnits.ChangeEventArgs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\ProjectUnits.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AwAgQAAAIAAAAACMgAgAoEDICCACANAxEIAAAADICVA=</HashCode>
+      <FileName>Engineering\ProjectUnits.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="TimeUnit" />
+      <Property Name="LengthUnit" />
+      <Property Name="MassUnit" />
+      <Property Name="ForceUnit" />
+      <Property Name="LinearWeightUnit" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.Cable">
+    <Position X="0.5" Y="3.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AACAAAAAACAAAAAIAAAAAAAAACAAABACAAABAQAAABE=</HashCode>
+      <FileName>Engineering\Cable.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.StrandedCable" BaseTypeListCollapsed="true">
+    <Position X="16.25" Y="9.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>CACAAAgBACgAgAEoCAAACAAEACECAAAQAgABAQAAAFA=</HashCode>
+      <FileName>Engineering\StrandedCable.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="StrandList" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.LoadedCable">
+    <Position X="12.5" Y="1.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>EgACIgAAAiAEAAAAAAAAAAMAAAAQQEIAAAAQAIIAAAA=</HashCode>
+      <FileName>Engineering\StrandedCable.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Span" />
+      <Property Name="Cable" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Stress" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="JA.Engineering.StrandGroup">
+    <Position X="12.5" Y="6.75" Width="2.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>IECAQAEACEBAABAIAgAkAAQCAQAGIAAQAQAABABBglE=</HashCode>
+      <FileName>Engineering\StrandGroup.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Specification" />
+      <Property Name="Material" />
+      <Property Name="Initial" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.Material">
+    <Position X="8.5" Y="8.75" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>ICBAAABAAAAAAAAoAAAAABQBAIAEAAAAAAAAAgAECBA=</HashCode>
+      <FileName>Engineering\Material.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.PolynomialStress">
+    <Position X="16.25" Y="6.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AEAAAABAAAAAAAAIYAUAAAAAgECBAAAAgAABAAAgABA=</HashCode>
+      <FileName>Engineering\StressCurves.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Curve" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Polynomial">
+    <Position X="19.25" Y="6.75" Width="2" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAMAAAAAEAAAAAQI4AcARgICCEAAAIAAAAAAAAEABBA=</HashCode>
+      <FileName>Functions.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JA.Engineering.StressGroup">
+    <Position X="12.5" Y="4" Width="2.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AIAAAgAAAAAAAAAAAAAACAAAAAAAgAIAAAAAAIAAAAA=</HashCode>
+      <FileName>Engineering\StrandGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JA.Engineering.Unit">
+    <Position X="4.5" Y="8.25" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="JA.Engineering.Unit.BaseUnit" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\Unit.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" Collapsed="true" />
+      </Class>
+      <Class Name="JA.Engineering.Unit.Scalar" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\Unit.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="JA.Engineering.Unit.Base" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\Unit.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="JA.Engineering.Unit.Product" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\Unit.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="JA.Engineering.Unit.Ratio" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\Unit.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="JA.Engineering.Unit.Exponent" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Engineering\Unit.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAIgAACABAAQEAADowYARAhIAAIBgIAIIoMAABCBCQA=</HashCode>
+      <FileName>Engineering\Unit.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="JA.Engineering.ICable">
+    <Position X="0.5" Y="1.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAABAQAAAAA=</HashCode>
+      <FileName>Engineering\Cable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="JA.Engineering.ISpan">
+    <Position X="4.5" Y="1.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQEAAAAAAAAAgAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Engineering\Span.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="JA.Engineering.Condition">
+    <Position X="12.75" Y="12.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAQAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Engineering\Loading.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="JA.Engineering.StrandSpec">
+    <Position X="19.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgEQgAAgAAAAAUAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Engineering\StrandedCable.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

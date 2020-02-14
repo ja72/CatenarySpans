@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="JA.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="lastSave" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="split" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">392</Value>
+    </Setting>
+    <Setting Name="projectUnits" Type="System.String" Scope="User">
+      <Value Profile="(Default)">FeetPoundSecond</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

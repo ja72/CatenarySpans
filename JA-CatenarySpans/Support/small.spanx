@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<RulingSpan 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Units Time="s" Length="in" Mass="oz" Force="ozf" />
+  <Spans>
+    <Catenary StartX="0" StartY="6" SpanX="15" SpanY="2" Weight="0.05" HorizontalTension="1.6" />
+    <Catenary StartX="15" StartY="8" SpanX="12" SpanY="-1" Weight="0.05" HorizontalTension="1.6" />
+  </Spans>
+</RulingSpan>
