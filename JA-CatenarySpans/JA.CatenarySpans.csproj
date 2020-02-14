@@ -106,7 +106,6 @@
     <Compile Include="Engineering\ItemList.cs" />
     <Compile Include="CatenarySpans\CatenaryTable.cs" />
     <Compile Include="Engineering\Cable.cs" />
-    <Compile Include="Engineering\CableChart.cs" />
     <Compile Include="Engineering\CatenaryCalculator.cs" />
     <Compile Include="Double.cs" />
     <Compile Include="Engineering\Catenary.cs" />
@@ -120,12 +119,8 @@
     <Compile Include="Engineering\EngValue.cs" />
     <Compile Include="Engineering\ProjectUnits.cs" />
     <Compile Include="Engineering\RulingSpan.cs" />
-    <Compile Include="Engineering\SagAndTension.cs" />
-    <Compile Include="Engineering\StrandGroup.cs" />
-    <Compile Include="Engineering\Loading.cs" />
     <Compile Include="Engineering\Material.cs" />
     <Compile Include="Engineering\Span.cs" />
-    <Compile Include="Engineering\StrandedCable.cs" />
     <Compile Include="Engineering\StressCurves.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -191,12 +186,10 @@
     <Compile Include="CatenarySpans\TensionForm.Designer.cs">
       <DependentUpon>TensionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SagTensTests.cs" />
     <Compile Include="Vector2.cs" />
     <None Include="small_2.spanx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Support\Sag10_Compare.xls" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\cross-small-white.png" />

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -31,24 +29,20 @@ namespace JA.Engineering
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public struct EngValue : IEquatable<num>, ICloneable
     {
-        public static string DefaultFormat="G";
-
-        int exponent;
-        double scalar;
-        int sign;
+        public static readonly string DefaultFormat="g";
 
         #region Factory
         EngValue(int sign, double value, int exponent)
         {
-            this.sign=sign;
-            this.scalar=value;
-            this.exponent=exponent;
+            this.Sign=sign;
+            this.Scalar=value;
+            this.Exponent=exponent;
         }
         public EngValue(EngValue other)
         {
-            this.sign=other.sign;
-            this.scalar=other.scalar;
-            this.exponent=other.exponent;
+            this.Sign=other.Sign;
+            this.Scalar=other.Scalar;
+            this.Exponent=other.Exponent;
         }
 
         public EngValue(int amount) : this((double)amount, ExponentGroup.Default) { }
@@ -58,12 +52,12 @@ namespace JA.Engineering
         public EngValue(double amount) : this(amount, ExponentGroup.Default) { }
         public EngValue(double amount, ExponentGroup groups)
         {
-            this.sign=Math.Sign(amount);
+            this.Sign=Math.Sign(amount);
             amount=Math.Abs(amount);
             if (num.IsInfinity(amount)||num.IsNaN(amount))
             {
-                this.scalar=amount;
-                this.exponent=0;
+                this.Scalar=amount;
+                this.Exponent=0;
             }
             else
             {
@@ -71,38 +65,38 @@ namespace JA.Engineering
                 {
                     if (amount>1.0)
                     {
-                        this.exponent=(int)(Math.Floor(Math.Log10(amount)/3.0)*3.0);
+                        this.Exponent=(int)(Math.Floor(Math.Log10(amount)/3.0)*3.0);
                     }
                     else
                     {
-                        this.exponent=(int)(Math.Ceiling(Math.Log10(amount)/3.0)*3.0);
+                        this.Exponent=(int)(Math.Ceiling(Math.Log10(amount)/3.0)*3.0);
                     }
-                    this.scalar=amount*Math.Pow(10.0, -exponent);
+                    this.Scalar=amount*Math.Pow(10.0, -Exponent);
                     // Make adjustments and groups
                     if (groups==ExponentGroup.Engineering)
                     {
-                        while (this.scalar>1e3)
+                        while (this.Scalar>1e3)
                         {
-                            this.scalar/=1e3;
-                            this.exponent+=3;
+                            this.Scalar/=1e3;
+                            this.Exponent+=3;
                         }
-                        while (this.scalar<0.1)
+                        while (this.Scalar<0.1)
                         {
-                            this.scalar*=1e3;
-                            this.exponent-=3;
+                            this.Scalar*=1e3;
+                            this.Exponent-=3;
                         }
                     }
                     else if (groups==ExponentGroup.Scientific)
                     {
-                        while (this.scalar>10)
+                        while (this.Scalar>10)
                         {
-                            this.scalar/=10;
-                            this.exponent++;
+                            this.Scalar/=10;
+                            this.Exponent++;
                         }
-                        while (this.scalar<0.1)
+                        while (this.Scalar<0.1)
                         {
-                            this.scalar*=10;
-                            this.exponent--;
+                            this.Scalar*=10;
+                            this.Exponent--;
                         }
                     }
                     else // no grouping
@@ -112,8 +106,8 @@ namespace JA.Engineering
                 }
                 else
                 {
-                    this.exponent=0;
-                    this.scalar=0;
+                    this.Exponent=0;
+                    this.Scalar=0;
                 }
             }
         }
@@ -122,11 +116,11 @@ namespace JA.Engineering
         /// </summary>
         public EngValue ToScalar()
         {
-            return new EngValue(sign, scalar*Math.Pow(10.0, exponent), 0);
+            return new EngValue(Sign, Scalar*Math.Pow(10.0, Exponent), 0);
         }
         public EngValue Round(int decimals)
         {
-            return new EngValue(sign, Math.Round(scalar, decimals, MidpointRounding.AwayFromZero), exponent);
+            return new EngValue(Sign, Math.Round(Scalar, decimals, MidpointRounding.AwayFromZero), Exponent);
         }
         public static implicit operator EngValue(double x) { return new EngValue(x); }
         public static implicit operator double(EngValue rhs) { return rhs.Value; }
@@ -138,27 +132,27 @@ namespace JA.Engineering
         /// <summary>
         /// The scaled value (absolute)
         /// </summary>
-        public double Scalar { get { return scalar; } }
+        public double Scalar { get; }
         /// <summary>
         /// The scaled value (signed)
         /// </summary>
-        public double SignedScalar { get { return sign*scalar; } }
+        public double SignedScalar { get { return Sign*Scalar; } }
         /// <summary>
         /// The value exponent
         /// </summary>
-        public int Exponent { get { return exponent; } }
+        public int Exponent { get; private set; }
         /// <summary>
         /// The value sign
         /// </summary>
-        public int Sign { get { return sign; } }
+        public int Sign { get; }
         /// <summary>
         /// The value represented by this EngValue (signed)
         /// </summary>
-        public double Value { get { return sign*scalar*Math.Pow(10, exponent); } }
+        public double Value { get { return Sign*Scalar*Math.Pow(10, Exponent); } }
         /// <summary>
         /// The value represented by thus EngValue (absolute)
         /// </summary>
-        public double AbsValue { get { return scalar*Math.Pow(10, exponent); } }
+        public double AbsValue { get { return Scalar*Math.Pow(10, Exponent); } }
 
         /// <summary>
         /// Checks if values is a finite number, or infinity/NaN
@@ -167,11 +161,11 @@ namespace JA.Engineering
         {
             get
             {
-                return !num.IsInfinity(scalar)&&!num.IsNaN(scalar);
+                return !num.IsInfinity(Scalar)&&!num.IsNaN(Scalar);
             }
         }
-        public bool IsPrefixed { get { return SI.ContainsKey(exponent); } }
-        public string SiPrefix { get { return IsPrefixed?SI[exponent]:string.Empty; } }
+        public bool IsPrefixed { get { return SI.ContainsKey(Exponent); } }
+        public string SiPrefix { get { return IsPrefixed?SI[Exponent]:string.Empty; } }
         #endregion
 
         #region Functions
@@ -197,7 +191,6 @@ namespace JA.Engineering
         {
             if (IsFinite&&format.StartsWith("S"))
             {
-                num value=Math.Round(scalar, 12); // remove any roundoff errors
                 int max_width=0;
                 int k=format.IndexOf('.');
                 if (k>=0)
@@ -254,42 +247,42 @@ namespace JA.Engineering
         /// <remarks>A formatted string</remarks>
         public string ToString(int max_width, int significant_digits)
         {
-            int expsign=Math.Sign(exponent);
-            exponent=Math.Abs(exponent);
-            int digits=scalar>0?(int)Math.Log10(scalar)+1:0;
+            int expsign=Math.Sign(Exponent);
+            Exponent=Math.Abs(Exponent);
+            int digits=Scalar>0?(int)Math.Log10(Scalar)+1:0;
             int decimals=Math.Max(significant_digits-digits, 0);
             double round=Math.Pow(10, -decimals);
-            digits=scalar>0?(int)Math.Log10(scalar+0.5*round)+1:0;
+            digits=Scalar>0?(int)Math.Log10(Scalar+0.5*round)+1:0;
             decimals=Math.Max(significant_digits-digits, 0);
             string t;
             string f="0:F";
-            if (exponent==0)
+            if (Exponent==0)
             {
-                t=string.Format("{"+f+decimals+"}", sign*scalar);
+                t=string.Format("{"+f+decimals+"}", Sign*Scalar);
             }
-            else if (SI.ContainsKey(expsign*exponent))
+            else if (SI.ContainsKey(expsign*Exponent))
             {
-                t=string.Format("{"+f+decimals+"}{1}", sign*scalar, SI[expsign*exponent]);
+                t=string.Format("{"+f+decimals+"}{1}", Sign*Scalar, SI[expsign*Exponent]);
             }
             else
             {
-                t=string.Format("{"+f+decimals+"}e{1}", sign*scalar, expsign*exponent);
+                t=string.Format("{"+f+decimals+"}e{1}", Sign*Scalar, expsign*Exponent);
             }
             // Adjust decimal digits to fit column
             if (t.Length>max_width&&max_width!=0)
             {
                 decimals=Math.Max(0, decimals-t.Length+max_width);
-                if (exponent==0)
+                if (Exponent==0)
                 {
-                    t=string.Format("{"+f+decimals+"}", sign*scalar);
+                    t=string.Format("{"+f+decimals+"}", Sign*Scalar);
                 }
-                else if (SI.ContainsKey(expsign*exponent))
+                else if (SI.ContainsKey(expsign*Exponent))
                 {
-                    t=string.Format("{"+f+decimals+"}{1}", sign*scalar, SI[expsign*exponent]);
+                    t=string.Format("{"+f+decimals+"}{1}", Sign*Scalar, SI[expsign*Exponent]);
                 }
                 else
                 {
-                    t=string.Format("{"+f+decimals+"}e{1}", sign*scalar, expsign*exponent);
+                    t=string.Format("{"+f+decimals+"}e{1}", Sign*Scalar, expsign*Exponent);
                 }
             }
             return t;
@@ -402,7 +395,7 @@ namespace JA.Engineering
 
         public EngValue Negate()
         {
-            return new EngValue(-sign, scalar, exponent);
+            return new EngValue(-Sign, Scalar, Exponent);
         }
 
         #endregion
