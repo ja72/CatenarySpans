@@ -300,9 +300,6 @@
     <None Include="Properties\DataSources\Vector2.datasource" />
     <None Include="Resources\blue-folder-open-document.png" />
     <Content Include="Chart2.ico" />
-    <Content Include="Support\drake.cablex">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Support\mks.spanx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
