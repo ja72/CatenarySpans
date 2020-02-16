@@ -20,8 +20,8 @@ namespace JA.Engineering
             double a=H/w;
             double η=span.x/(2*a);
 
-            double xc=span.x/2+a*asinh((span.y*exp(η))/(a*(1-exp(2*η))));
-            double yc=-a*(cosh(-xc/a)-1);
+            double xc=span.x/2+a*DoubleEx.Asinh((span.y*Math.Exp(η))/(a*(1-Math.Exp(2*η))));
+            double yc=-a*(Math.Cosh(-xc/a)-1);
 
             return new Vector2(xc, yc);
         }
@@ -36,7 +36,7 @@ namespace JA.Engineering
         public static double MaximumSagX(Vector2 span, Vector2 center, double w, double H)
         {
             double a=H/w;
-            return center.x+a*asinh(span.y/span.x);
+            return center.x+a*DoubleEx.Asinh(span.y/span.x);
         }
 
         /// <summary>
@@ -50,8 +50,8 @@ namespace JA.Engineering
         public static double MaximumSag(Vector2 span, Vector2 center, double w, double H)
         {
             double a=H/w;
-            double x=center.x+a*asinh(span.y/span.x);
-            double y=center.y+a*(cosh((x-center.x)/a)-1);
+            double x=center.x+a*DoubleEx.Asinh(span.y/span.x);
+            double y=center.y+a*(Math.Cosh((x-center.x)/a)-1);
             return span.y/span.x*x-y;
         }
         /// <summary>
@@ -90,7 +90,7 @@ namespace JA.Engineering
         public static double SagAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
             double a=H/w;
-            double y=center.y+a*(cosh((x-center.x)/a)-1);
+            double y=center.y+a*(Math.Cosh((x-center.x)/a)-1);
             return span.y/span.x*x-y;
         }
         /// <summary>
@@ -142,7 +142,7 @@ namespace JA.Engineering
         public static Vector2 PositionAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
             double a=H/w;
-            return new Vector2(x, center.y+a*(cosh((x-center.x)/a)-1));
+            return new Vector2(x, center.y+a*(Math.Cosh((x-center.x)/a)-1));
         }
         /// <summary>
         /// Calculate the position on the curve based on paramter <c>t</c> ranging from 0 to 1.
@@ -170,7 +170,7 @@ namespace JA.Engineering
         public static double LengthSegmentAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
             double a=H/w;
-            return a*(sinh((x-center.x)/a)+sinh(center.x/a));
+            return a*(Math.Sinh((x-center.x)/a)+Math.Sinh(center.x/a));
         }
         /// <summary>
         /// Calculate the vertical tension value at the x-coordinate specified.
@@ -183,7 +183,7 @@ namespace JA.Engineering
         /// <returns>The vertical tension value</returns>
         public static double VertricalTensionAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
-            return H*sinh(w*(x-center.x)/H);
+            return H*Math.Sinh(w*(x-center.x)/H);
         }
         /// <summary>
         /// Calculate the total tension value at the x-coordinate specified.
@@ -196,7 +196,7 @@ namespace JA.Engineering
         /// <returns>The total tension value</returns>
         public static double TotalTensionAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
-            return H*cosh(w*(x-center.x)/H);
+            return H*Math.Cosh(w*(x-center.x)/H);
         }
         /// <summary>
         /// Calculate the avarage tension along the curve, averaged across the length of the curve.
@@ -210,7 +210,7 @@ namespace JA.Engineering
         {
             double ξ=center.x/span.x;
             double η=w*span.x/(2*H);
-            return H*(η+0.25*(sinh(4*η*(1-ξ))+sinh(4*η*ξ)))/(sinh(2*η*(1-ξ))+sinh(2*η*ξ));
+            return H*(η+0.25*(Math.Sinh(4*η*(1-ξ))+Math.Sinh(4*η*ξ)))/(Math.Sinh(2*η*(1-ξ))+Math.Sinh(2*η*ξ));
         }
         /// <summary>
         /// Calculate the avarage tension along the curve, averaged across the length of the curve.
@@ -229,9 +229,9 @@ namespace JA.Engineering
 
         #region Catenrary Solvers
 
-        public static double MinTension=1;
-        public static double MinSag=1e-2;
-        public static double MinExtension=1e-2;
+        public const double MinTension=1;
+        public const double MinSag=1e-2;
+        public const double MinExtension=1e-2;
 
         /// <summary>
         /// Calculates the horizontal tension needed to achieve specified average tension
@@ -246,7 +246,7 @@ namespace JA.Engineering
             if (tol<=0) tol=1e-8;
             P=Math.Max(P, MinTension);
             double σ=span.x*w;
-            double H_init=P/2+sqrt(sq(P/2)-sq(σ)/24);
+            double H_init=P/2+Math.Sqrt(DoubleEx.Sqr(P/2)-DoubleEx.Sqr(σ)/24);
 
             Func<double, double> f=(H_) => AverageTension(span, w, H_);
             if (f.Bisection(P, H_init, tol, out double H))
@@ -267,7 +267,7 @@ namespace JA.Engineering
         {
             if (tol<=0) tol=1e-4;
             D=Math.Max(D, MinSag);
-            double H_init=sq(span.x)*w/(8*D);
+            double H_init=DoubleEx.Sqr(span.x)*w/(8*D);
 
             Func<double, double> f=(H_) => MaximumSag(span, w, H_);
 
@@ -289,7 +289,7 @@ namespace JA.Engineering
         {
             if (tol<=0) tol=1e-6;
             L=Math.Max(L, MinExtension+span.Manitude);
-            double H_init=L>span.Manitude?w*sqrt(cub(span.Manitude)/(24*(L-span.Manitude))):100000;
+            double H_init=L>span.Manitude?w*Math.Sqrt(DoubleEx.Cub(span.Manitude)/(24*(L-span.Manitude))):100000;
 
             Func<double, double> f=(H_) => TotalLength(span, w, H_);
 
@@ -336,7 +336,7 @@ namespace JA.Engineering
         {
             if (tol<=0) tol=1e-4;
             C=Math.Min(C, MinSag);
-            double H_init=sq(span.x)*w/(8*C);
+            double H_init=DoubleEx.Sqr(span.x)*w/(8*C);
             Func<double, double> f=(H_) => -CenterPosition(span, w, H_).y;
 
             if (f.Bisection(C, H_init, tol, out double H))
@@ -360,23 +360,10 @@ namespace JA.Engineering
         {
             double a=H/w;
             double L=TotalLength(span, center, w, H);
-            return center.x+a*asinh(t*L/a-sinh(center.x/a));
+            return center.x+a*DoubleEx.Asinh(t*L/a-Math.Sinh(center.x/a));
         }
         
         #endregion
-
-        #region Math Help
-        static Func<double, double> sq=(x) => x*x;
-        static Func<double, double> cub=(x) => x*x*x;
-        static Func<double, double> sqrt=(x) => Math.Sqrt(x);
-        static Func<double, double> cubrt=(x) => Math.Pow(x, 1/3.0);
-        static Func<double, double> ln=(x) => Math.Log(x);
-        static Func<double, double> exp=(x) => Math.Exp(x);
-        static Func<double, double> cosh=(x) => Math.Cosh(x);
-        static Func<double, double> sinh=(x) => Math.Sinh(x);
-        static Func<double, double> asinh=(x) => Math.Log(x+Math.Sqrt(x*x+1));
-
-        #endregion        
 
     }
 

@@ -13,35 +13,30 @@ namespace JA.CatenarySpans
     #region Graphics
     public class CatenaryGraphics : JA.Printing.IPrintable
     {
-        Style style=Style.Default;
-        readonly RulingSpan rs;
         Vector2 mouse_over, mouse_dn;
-        HorizontalAlignment align;
 
         public CatenaryGraphics(RulingSpan rs)
         {
-            this.rs=rs;
-            this.style.string_format.Alignment=StringAlignment.Center;
-            this.style.smoothing_mode=System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            this.style.compositing_quality=System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            this.RulingSpan=rs;
+            this.Style = Style.Default;
             this.mouse_over=Vector2.Origin;
             this.mouse_dn=Vector2.Origin;
-            this.align=HorizontalAlignment.Left;
+            this.Alignment=HorizontalAlignment.Left;
         }
-        public Style Style { get { return style; } set { style=value; } }
-        public RulingSpan RulingSpan { get { return rs; } }
+        public Style Style { get; set; }
+        public RulingSpan RulingSpan { get; }
         public void GetBounds(out Vector2 min_position, out Vector2 max_position)
         {
             min_position=Vector2.Origin;
             max_position=Vector2.Origin;
-            foreach (var item in rs.Spans)
+            foreach (var item in RulingSpan.Spans)
             {
                 item.GetBounds(ref min_position, ref max_position);
             }
         }
         public Canvas GetCanvasFor(RectangleF target)
         {
-            //Vector2 minPosition, maxPosition;
+            
             GetBounds(out Vector2 minPosition, out Vector2 maxPosition);
 
             return new Canvas(target, minPosition, maxPosition);
@@ -59,16 +54,21 @@ namespace JA.CatenarySpans
         public Vector2 MouseDownPosition { get { return mouse_dn; } }
         public Vector2 MousePosition { get { return mouse_over; } }
 
+        public void Render(Graphics g, PointF pos, SizeF bounds)
+        {
+            Render(g, new RectangleF(pos, bounds));
+        }
+
         public void Render(Graphics g, RectangleF target)
         {
             Canvas canvas=GetCanvasFor(target);
-            style.SetGraphicsQuality(g);
+            Style.SetGraphicsQuality(g);
             Catenary catenary=RulingSpan.FindCatenaryFromX(mouse_over.x);
-            foreach (var item in rs.Spans)
+            foreach (var item in RulingSpan.Spans)
             {
-                RenderOne(g, canvas, item, style, catenary == item);
+                RenderOne(g, canvas, item, Style, catenary == item);
             }
-            //if (button==MouseButtons.Right&&!mouse_dn.IsZero)
+            
             if (!mouse_dn.IsZero)
             {
                 catenary=RulingSpan.FindCatenaryFromX(mouse_dn.x);
@@ -78,22 +78,21 @@ namespace JA.CatenarySpans
                     PointF A=canvas.Map(mouse_dn.x, y);
                     PointF M=canvas.Map(mouse_dn);
                     string text=Math.Abs(y-mouse_dn.y).ToString("0.#");
-                    style.VerticalArrow(g, M.X, M.Y, A.Y, text, false);
+                    Style.VerticalArrow(g, M.X, M.Y, A.Y, text, false);
                 }
-                using (Pen pen=style.MakePen(Color.Red))
+                using (Pen pen=Style.MakePen(Color.Red))
                 {
                     PointF M=canvas.Map(mouse_dn);
                     g.DrawEllipse(pen,
-                        M.X-style.point_width/2,
-                        M.Y-style.point_width/2,
-                        style.point_width,
-                        style.point_width);
+                        M.X-Style.PointWidth/2,
+                        M.Y-Style.PointWidth/2,
+                        Style.PointWidth,
+                        Style.PointWidth);
 
-                    using (Font font=style.MakeFont(SystemFonts.DialogFont))
+                    using (Font font=Style.MakeFont(SystemFonts.DialogFont))
                     {
                         string text=string.Format("x:{0:0}\ny:{1:0.#}", mouse_dn.x, mouse_dn.y);
-                        StringFormat sf=new StringFormat();
-                        //sf.Alignment = StringAlignment.Center;
+                        StringFormat sf=new StringFormat();                        
                         SizeF sz=g.MeasureString(text, font, M, sf);
 
                         g.FillRectangle(Brushes.White, M.X-sz.Width-4, M.Y-4, sz.Width+2, sz.Height+2);
@@ -122,8 +121,8 @@ namespace JA.CatenarySpans
                 em=g.MeasureString("M", font);
                 float y=canvas.Target.Top+em.Height;
                 style.HorizontalArrow(g, y, A.X, B.X, txt, true);
-                g.DrawLine(Pens.Black, A.X, A.Y-style.point_width/2, A.X, y-0.75f*em.Height);
-                g.DrawLine(Pens.Black, B.X, B.Y-style.point_width/2, B.X, y-0.75f*em.Height);
+                g.DrawLine(Pens.Black, A.X, A.Y-style.PointWidth/2, A.X, y-0.75f*em.Height);
+                g.DrawLine(Pens.Black, B.X, B.Y-style.PointWidth/2, B.X, y-0.75f*em.Height);
             }
             // Top dimensions
 
@@ -147,15 +146,15 @@ namespace JA.CatenarySpans
 
                     var txt1=string.Format("{0:0.#}", catenary.StartPosition.y);
                     var txt2=string.Format("{0:0.#}", catenary.EndPosition.y);
-                    var sf = new StringFormat(style.string_format)
+                    var sf = new StringFormat(style.StringFormat)
                     {
                         FormatFlags = StringFormatFlags.DirectionVertical
                     };
                     SizeF sz1=g.MeasureString(txt1, font, A0, sf);
                     SizeF sz2=g.MeasureString(txt2, font, B0, sf);
 
-                    g.DrawString(txt1, font, Brushes.Black, A0.X-sz1.Width/2, A0.Y+style.point_width/2);
-                    g.DrawString(txt2, font, Brushes.Black, B0.X-sz2.Width/2, B0.Y+style.point_width/2);
+                    g.DrawString(txt1, font, Brushes.Black, A0.X-sz1.Width/2, A0.Y+style.PointWidth/2);
+                    g.DrawString(txt2, font, Brushes.Black, B0.X-sz2.Width/2, B0.Y+style.PointWidth/2);
                 }
             }
             // Curves
@@ -168,18 +167,18 @@ namespace JA.CatenarySpans
                 {
                     points[i]=canvas.Map(f(((double)i)/N));
                 }
-                pen.Width=selected?4f:style.pen_width;
+                pen.Width=selected?4f:style.PenWidth;
                 g.DrawCurve(pen, points);
             }
             // Points
             using (SolidBrush brush=style.MakeSolidBrush(Color.Red))
             {
-                g.FillEllipse(brush, A.X-style.point_width/2, A.Y-style.point_width/2, style.point_width, style.point_width);
-                g.FillEllipse(brush, B.X-style.point_width/2, B.Y-style.point_width/2, style.point_width, style.point_width);
+                g.FillEllipse(brush, A.X-style.PointWidth/2, A.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+                g.FillEllipse(brush, B.X-style.PointWidth/2, B.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
                 if (catenary.IsCenterInSpan)
                 {
                     brush.Color=Color.Plum;
-                    g.FillEllipse(brush, C.X-style.point_width/2, C.Y-style.point_width/2, style.point_width, style.point_width);
+                    g.FillEllipse(brush, C.X-style.PointWidth/2, C.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
                 }
             }
             // Clearance
@@ -187,18 +186,19 @@ namespace JA.CatenarySpans
 
             using (Pen pen=style.MakePen(Color.Black))
             {
-                g.DrawEllipse(pen, A.X-style.point_width/2, A.Y-style.point_width/2, style.point_width, style.point_width);
-                g.DrawEllipse(pen, B.X-style.point_width/2, B.Y-style.point_width/2, style.point_width, style.point_width);
+                g.DrawEllipse(pen, A.X-style.PointWidth/2, A.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+                g.DrawEllipse(pen, B.X-style.PointWidth/2, B.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
                 if (catenary.IsCenterInSpan)
                 {
-                    g.DrawEllipse(pen, C.X-style.point_width/2, C.Y-style.point_width/2, style.point_width, style.point_width);
+                    g.DrawEllipse(pen, C.X-style.PointWidth/2, C.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
 
                     var txt=string.Format("{0:0.#}", catenary.CenterY);
-                    style.VerticalArrow(g, C.X, C0.Y, C.Y+style.point_width/2, txt, false);
+                    style.VerticalArrow(g, C.X, C0.Y, C.Y+style.PointWidth/2, txt, false);
 
                 }
             }
             // Sag
+#pragma warning disable S1199 // Nested code blocks should not be used
             {
                 Vector2 d=catenary.SagPosition;
                 double t=(d.x-catenary.StartPosition.x)/catenary.SpanX;
@@ -208,15 +208,12 @@ namespace JA.CatenarySpans
                 var txt=string.Format("{0:0.#}", catenary.MaximumSag);
                 style.VerticalArrow(g, D.X, H.Y, D.Y, txt, false);
             }
+#pragma warning restore S1199 // Nested code blocks should not be used
         }
         #endregion
 
         #region IPrintable Members
 
-        public void Render(Graphics g, PointF pos, SizeF bounds)
-        {
-            Render(g, new RectangleF(pos, bounds));
-        }
 
         public SizeF GetSize(Graphics g, Rectangle page, PointF pos)
         {
@@ -224,11 +221,7 @@ namespace JA.CatenarySpans
             float ht=0.2f*wt;
             return new SizeF(wt, ht);
         }
-        public HorizontalAlignment Alignment
-        {
-            get { return align; }
-            set { align=value; }
-        }
+        public HorizontalAlignment Alignment { get; set; }
 
         #endregion
 
@@ -252,6 +245,7 @@ namespace JA.CatenarySpans
         }
         public void MouseUp(Control control, PointF point, MouseButtons button)
         {
+            // Nothing yet
         }
         public void MouseMove(Control control, PointF point, MouseButtons button)
         {
@@ -265,6 +259,7 @@ namespace JA.CatenarySpans
         }
         public void MouseLeave(Control control)
         {
+            // Nothing yet
         }
         #endregion
 

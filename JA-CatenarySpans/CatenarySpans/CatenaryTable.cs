@@ -19,8 +19,8 @@ namespace JA.CatenarySpans
         public CatenaryTable(RulingSpan rs, Vector2 clearance_pt)
         {
             this.rs=rs;
-            this.style.string_format.Alignment=StringAlignment.Center;
-            this.style.smoothing_mode=System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            this.style.StringFormat.Alignment=StringAlignment.Center;
+            this.style.SmoothingMode=System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             this.clearance_pt=clearance_pt;
             this.align=HorizontalAlignment.Center;
         }
@@ -106,27 +106,27 @@ namespace JA.CatenarySpans
             SizeF em = SizeF.Empty;
             string[] headers=TableHeaders();
             int[] widths=ColumnWidths();
-            using(var brush=style.MakeSolidBrush(style.text_color))
+            using(var brush=style.MakeSolidBrush(style.TextColor))
             {
                 float x=pos.X, y=pos.Y, ht=0;
-                style.font_family=System.Drawing.FontFamily.GenericSerif;
-                style.string_format.Alignment=StringAlignment.Center;
-                style.string_format.LineAlignment=StringAlignment.Center;
+                style.FontFamily=System.Drawing.FontFamily.GenericSerif;
+                style.StringFormat.Alignment=StringAlignment.Center;
+                style.StringFormat.LineAlignment=StringAlignment.Center;
                 using(var font=style.MakeFont())
                 {
                     em=g.MeasureString("M", font);
                     for(int j=0; j<headers.Length; j++)
                     {
-                        SizeF sz=g.MeasureString(headers[j], font, (int)(widths[j]*em.Width), style.string_format);
+                        SizeF sz=g.MeasureString(headers[j], font, (int)(widths[j]*em.Width), style.StringFormat);
                         if(ht<sz.Height) { ht=sz.Height; }
                         RectangleF rect=new RectangleF(x, y, widths[j]*em.Width, sz1.Height-1);
-                        g.DrawString(headers[j], font, brush, rect, style.string_format);
+                        g.DrawString(headers[j], font, brush, rect, style.StringFormat);
                         g.DrawLine(Pens.Gray, x, pos.Y, x, pos.Y+sz1.Height+4+sz2.Height-1);
                         x+=widths[j]*em.Width+4;
                     }
                 }
-                style.font_family=System.Drawing.FontFamily.GenericSansSerif;
-                style.string_format.Alignment=StringAlignment.Center;
+                style.FontFamily=System.Drawing.FontFamily.GenericSansSerif;
+                style.StringFormat.Alignment=StringAlignment.Center;
                 y=pos.Y+sz1.Height+4;
                 x=pos.X;
                 g.DrawLine(Pens.Gray, x, y-5, x+sz1.Width, y-5);
@@ -140,16 +140,16 @@ namespace JA.CatenarySpans
                         for(int j=0; j<row.Length; j++)
                         {
                             RectangleF rect=new RectangleF(x, y, widths[j]*em.Width, em.Height);
-                            g.DrawString(row[j], font, brush, rect, style.string_format);
+                            g.DrawString(row[j], font, brush, rect, style.StringFormat);
                             x+=widths[j]*em.Width+4;
                         }
                         y+=em.Width+4;
                     }
 
                 }
-                style.font_family=System.Drawing.FontFamily.GenericSerif;
-                style.string_format.Alignment=StringAlignment.Center;
-                style.string_format.LineAlignment=StringAlignment.Near;
+                style.FontFamily=System.Drawing.FontFamily.GenericSerif;
+                style.StringFormat.Alignment=StringAlignment.Center;
+                style.StringFormat.LineAlignment=StringAlignment.Near;
 
                 y=pos.Y+sz1.Height+4+sz2.Height+4;
                 x=pos.X;
@@ -160,7 +160,7 @@ namespace JA.CatenarySpans
                     int wt=ColumnWidths().Sum();
                     {
                         RectangleF rect=new RectangleF(x, y, wt*em.Width, em.Height);
-                        g.DrawString(TableFooter(), font, brush, rect, style.string_format);
+                        g.DrawString(TableFooter(), font, brush, rect, style.StringFormat);
                         x+=wt*em.Width+4;
                         y+=em.Width+4;
                     }
@@ -184,16 +184,16 @@ namespace JA.CatenarySpans
         {
             string footer=TableFooter();
             style.SetGraphicsQuality(g);
-            style.font_family=System.Drawing.FontFamily.GenericSerif;
-            style.string_format.Alignment=StringAlignment.Near;
-            style.string_format.LineAlignment=StringAlignment.Near;
+            style.FontFamily=System.Drawing.FontFamily.GenericSerif;
+            style.StringFormat.Alignment=StringAlignment.Near;
+            style.StringFormat.LineAlignment=StringAlignment.Near;
             float ht=0;
             float x=0;
             using(var font=style.MakeFont())
             {
                 SizeF em=g.MeasureString("M", font);
                 int wt=ColumnWidths().Sum();
-                SizeF sz=g.MeasureString(footer, font, (int)(wt*em.Width), style.string_format);
+                SizeF sz=g.MeasureString(footer, font, (int)(wt*em.Width), style.StringFormat);
                 if(ht<sz.Height) { ht=sz.Height; }
                 x+=wt*em.Width+4;
             }
@@ -206,16 +206,16 @@ namespace JA.CatenarySpans
             int[] widths=ColumnWidths();
             float x=0;
             style.SetGraphicsQuality(g);
-            style.font_family=System.Drawing.FontFamily.GenericSerif;
-            style.string_format.Alignment=StringAlignment.Center;
-            style.string_format.LineAlignment=StringAlignment.Center;
+            style.FontFamily=System.Drawing.FontFamily.GenericSerif;
+            style.StringFormat.Alignment=StringAlignment.Center;
+            style.StringFormat.LineAlignment=StringAlignment.Center;
             using(var font=style.MakeFont())
             {
                 SizeF em=g.MeasureString("M", font);
 
                 for(int j=0; j<headers.Length; j++)
                 {
-                    SizeF sz=g.MeasureString(headers[j], font, (int)(widths[j]*em.Width), style.string_format);
+                    SizeF sz=g.MeasureString(headers[j], font, (int)(widths[j]*em.Width), style.StringFormat);
                     if(ht<sz.Height) { ht=sz.Height; }
                     x+=widths[j]*em.Width+4;
                 }
@@ -227,8 +227,8 @@ namespace JA.CatenarySpans
         {
             float wt=0, ht=0;
             int[] widths=ColumnWidths();
-            style.font_family=System.Drawing.FontFamily.GenericSansSerif;
-            style.string_format.Alignment=StringAlignment.Center;
+            style.FontFamily=System.Drawing.FontFamily.GenericSansSerif;
+            style.StringFormat.Alignment=StringAlignment.Center;
             int N=rs.Spans.Count();
             using(var font=style.MakeFont())
             {

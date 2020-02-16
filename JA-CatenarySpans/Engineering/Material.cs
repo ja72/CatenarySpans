@@ -37,12 +37,6 @@ namespace JA.Engineering
     /// </summary>
     public class Material : IMaterial, ICloneable
     {
-        double ρ;
-        double α;
-        double E;
-        double σU;
-        double σY;
-        readonly string name;
 
         /// <summary>
         /// Define new material properties
@@ -54,19 +48,17 @@ namespace JA.Engineering
         /// <param name="σU">Ultimate stress (psi)</param>
         public Material(string name, double ρ, double E, double α, double σU, double σY)
         {
-            this.name = name;
-            this.E = E;
-            this.ρ = ρ;
-            this.α = α;
-            this.σU = σU;
-            this.σY = σY;
+            this.Name = name;
+            this.Elasticity = E;
+            this.Density = ρ;
+            this.CTE = α;
+            this.UltimateStress = σU;
+            this.YieldStress = σY;
         }
         public Material(IMaterial other)
             : this(other.Name, other.Density, other.Elasticity, other.CTE, other.UltimateStress, other.YieldStress)
         { }
         public Material(MaterialSpec spec) : this(Standard(spec)) { }
-        //public static readonly Material Aluminum = Standard(MaterialSpec.ALUMINUM);
-        //public static readonly Material Steel = Standard(MaterialSpec.STEEL);
         public static Material Standard(MaterialSpec spec)
         {
             switch (spec)
@@ -79,17 +71,17 @@ namespace JA.Engineering
             throw new NotImplementedException();
         }
         [XmlAttribute]
-        public string Name { get { return name; } }
+        public string Name { get; }
         [XmlAttribute]
-        public double Density { get { return ρ; } set { ρ = value; } }
+        public double Density { get; set; }
         [XmlAttribute]
-        public double Elasticity { get { return E; } set { E = value; } }
+        public double Elasticity { get; set; }
         [XmlAttribute]
-        public double CTE { get { return α; } set { α = value; } }
+        public double CTE { get; set; }
         [XmlAttribute]
-        public double UltimateStress { get { return σU; } set { σU = value; } }
+        public double UltimateStress { get; set; }
         [XmlAttribute]
-        public double YieldStress { get { return σY; } set { σY = value; } }
+        public double YieldStress { get; set; }
 
         #region ICloneable Members
 

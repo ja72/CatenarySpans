@@ -19,12 +19,13 @@ namespace JA.Engineering
         string UnitSymbols { get; set; }
     }
 
-    [DebuggerDisplay("{ToString()}")]
+#pragma warning disable S4035 // Classes implementing "IEquatable<T>" should be sealed
     public class ProjectUnits : IEquatable<ProjectUnits>, ICloneable
+#pragma warning restore S4035 // Classes implementing "IEquatable<T>" should be sealed
     {
 
-        public static ProjectUnitSystem DefaultUnitSystem=ProjectUnitSystem.NewtonMeterSecond;
-        public static readonly ProjectUnits Default=new ProjectUnits();
+        public static readonly ProjectUnitSystem DefaultUnitSystem = ProjectUnitSystem.NewtonMeterSecond;
+        public static readonly ProjectUnits Default = new ProjectUnits();
 
         string time_sym, length_sym, mass_sym, force_sym;
         Unit time_unit, length_unit, mass_unit, force_unit;
@@ -90,7 +91,7 @@ namespace JA.Engineering
         {
             foreach (var sym in units)
             {
-                Unit unit=sym;
+                Unit unit = sym;
                 if (unit.IsCompatible(Unit.s)) { time_sym=sym; }
                 if (unit.IsCompatible(Unit.m)) { length_sym=sym; }
                 if (unit.IsCompatible(Unit.kg)) { mass_sym=sym; }
@@ -129,10 +130,11 @@ namespace JA.Engineering
             get { return time_sym; }
             set
             {
-                string old=time_sym;
+                string old = time_sym;
                 if (!Unit.AreEqual(old, value))
                 {
                     time_sym=value;
+                    time_unit = Unit.Parse(value);
                     if (RaiseChangeEvents)
                         OnTimeUnitChanged(new UnitChangeEventArgs(old, value));
                 }
@@ -146,10 +148,11 @@ namespace JA.Engineering
             get { return length_sym; }
             set
             {
-                string old=length_sym;
+                string old = length_sym;
                 if (!Unit.AreEqual(old, value))
                 {
                     length_sym=value;
+                    length_unit = Unit.Parse(value);
                     if (RaiseChangeEvents)
                         OnLengthUnitChanged(new UnitChangeEventArgs(old, value));
                 }
@@ -163,10 +166,11 @@ namespace JA.Engineering
             get { return mass_sym; }
             set
             {
-                string old=mass_sym;
+                string old = mass_sym;
                 if (!Unit.AreEqual(old, value))
                 {
                     mass_sym=value;
+                    mass_unit = Unit.Parse(value);
                     if (RaiseChangeEvents)
                         OnMassUnitChanged(new UnitChangeEventArgs(old, value));
                 }
@@ -180,10 +184,11 @@ namespace JA.Engineering
             get { return force_sym; }
             set
             {
-                string old=force_sym;
+                string old = force_sym;
                 if (!Unit.AreEqual(old, value))
                 {
                     force_sym=value;
+                    force_unit = Unit.Parse(value);
                     if (RaiseChangeEvents)
                         OnForceUnitChanged(new UnitChangeEventArgs(old, value));
                 }
@@ -205,26 +210,27 @@ namespace JA.Engineering
                 return null;
             }
             value=value.TrimStart('(').TrimEnd(')');
-            string[] unit_sym=value.Split(',');
+            string[] unit_sym = value.Split(',');
             return new ProjectUnits(unit_sym);
         }
         public static ProjectUnits[] PredefinedUnits
         {
             get
             {
-                var vals=(ProjectUnitSystem[])Enum.GetValues(typeof(ProjectUnitSystem));
+                var vals = (ProjectUnitSystem[])Enum.GetValues(typeof(ProjectUnitSystem));
+#pragma warning disable S2365 // Properties should not make collection or array copies
                 return vals.Select((en) => new ProjectUnits(en)).ToArray();
+#pragma warning restore S2365 // Properties should not make collection or array copies
             }
         }
 
         public System.Windows.Forms.ToolStripMenuItem ToMenuItem(System.Drawing.Image icon,
             EventHandler<SetEventArgs> select_units)
         {
-            EventHandler click=(tsi, ev) =>
+            void click(object tsi, EventArgs ev)
             {
-                //var pu=(tsi as System.Windows.Forms.ToolStripItem).Tag as ProjectUnits;
                 select_units?.Invoke(tsi, new SetEventArgs(this));
-            };
+            }
             return new System.Windows.Forms.ToolStripMenuItem(this.ToString(), icon, click) { Tag=this };
         }
 
@@ -259,9 +265,9 @@ namespace JA.Engineering
         /// <returns>False if object is a different type, otherwise it calls <code>Equals(ProjectUnits)</code></returns>
         public override bool Equals(object obj)
         {
-            if (obj is ProjectUnits)
+            if (obj is ProjectUnits units)
             {
-                return Equals((ProjectUnits)obj);
+                return Equals(units);
             }
             return false;
         }
@@ -279,11 +285,13 @@ namespace JA.Engineering
                 &&force_sym.Equals(other.force_sym);
         }
 
+#pragma warning disable S2328 // "GetHashCode" should not reference mutable fields
         /// <summary>
         /// Calculates the hash code for the <see cref="ProjectUnits"/>
         /// </summary>
         /// <returns>The int hash value</returns>
         public override int GetHashCode()
+#pragma warning restore S2328 // "GetHashCode" should not reference mutable fields
         {
             unchecked
             {
@@ -320,12 +328,8 @@ namespace JA.Engineering
             }
             public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
             {
-                //var proj=(ProjectUnits)context.Instance;
-
                 return new StandardValuesCollection(
                     ProjectUnits.PredefinedUnits.Select((pu) => pu.ToString()).ToArray());
-
-                //return base.GetStandardValues(context);
             }
         }
 
@@ -395,7 +399,5 @@ namespace JA.Engineering
         #endregion
 
     }
-
-
 
 }

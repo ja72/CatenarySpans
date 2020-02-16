@@ -121,9 +121,6 @@
     <Compile Include="Engineering\RulingSpan.cs" />
     <Compile Include="Engineering\Material.cs" />
     <Compile Include="Engineering\Span.cs" />
-    <Compile Include="Engineering\StressCurves.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Engineering\Unit.cs" />
     <Compile Include="Ex.cs" />
     <Compile Include="Functions.cs" />

@@ -13,35 +13,33 @@ namespace JA.Engineering
         double RatedStrength { get; }
         double Weight { get; }
     }
-    
+
     public class Cable : ICable, ICloneable
     {
-        readonly double area, dia, wt, rts;
 
         #region Factory
         public Cable(double area, double dia, double wt, double rts)
         {
-            this.area = area;
-            this.dia = dia;
-            this.wt = wt;
-            this.rts = rts;
+            this.Area = area;
+            this.Diameter = dia;
+            this.Weight = wt;
+            this.RatedStrength = rts;
         }
 
         public Cable(ICable other)
             : this(other.Area, other.Diameter, other.Weight, other.RatedStrength)
-        {        } 
+        { }
 
         public Cable(Cable other)
-            : this(other.area, other.dia, other.wt, other.rts)
-        {         }
+            : this(other.Area, other.Diameter, other.Weight, other.RatedStrength)
+        { }
         #endregion
 
         #region Properties
-        public double Area { get { return area; } }
-        public double Weight { get { return wt; } }
-        public double Diameter { get { return dia; } }
-        public double RatedStrength { get { return rts; } }
-
+        public double Area { get; }
+        public double Weight { get; }
+        public double Diameter { get; }
+        public double RatedStrength { get; }
         #endregion
 
         #region ICloneable
