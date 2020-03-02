@@ -73,8 +73,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="CatenaryTests.cs" />
+    <Compile Include="Engineering\CatenaryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Engineering\RulingSpanTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JA-CatenarySpans\JA.CatenarySpans.csproj">

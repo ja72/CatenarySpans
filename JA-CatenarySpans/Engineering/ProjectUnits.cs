@@ -24,7 +24,7 @@ namespace JA.Engineering
 #pragma warning restore S4035 // Classes implementing "IEquatable<T>" should be sealed
     {
 
-        public static readonly ProjectUnitSystem DefaultUnitSystem = ProjectUnitSystem.NewtonMeterSecond;
+        public static readonly ProjectUnitSystem DefaultUnitSystem = ProjectUnitSystem.FeetPoundSecond;
         public static readonly ProjectUnits Default = new ProjectUnits();
 
         string time_sym, length_sym, mass_sym, force_sym;

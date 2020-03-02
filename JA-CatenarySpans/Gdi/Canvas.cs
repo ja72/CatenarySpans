@@ -34,14 +34,14 @@ namespace JA.Gdi
             B=Math.Max(B, T+1); // allow for at least one pixel to display
             R=Math.Max(R, L+1); // allow for at least one pixel
 
-            double dx=max_position.x-min_position.x;
-            double dy=max_position.y-min_position.y;
+            double dx=max_position.X-min_position.X;
+            double dy=max_position.Y-min_position.Y;
 
             if(dx>0&&dy>0)
             {
                 origin=new PointF(
-                    L+(float)(min_position.x*(L-R)/dx),
-                    B+(float)(min_position.y*(B-T)/dy));
+                    L+(float)(min_position.X*(L-R)/dx),
+                    B+(float)(min_position.Y*(B-T)/dy));
 
                 scale=new SizeF(
                     (float)((R-L)/dx),

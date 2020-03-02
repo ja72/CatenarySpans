@@ -63,7 +63,7 @@ namespace JA.CatenarySpans
         {
             Canvas canvas=GetCanvasFor(target);
             Style.SetGraphicsQuality(g);
-            Catenary catenary=RulingSpan.FindCatenaryFromX(mouse_over.x);
+            Catenary catenary=RulingSpan.FindCatenaryFromX(mouse_over.X);
             foreach (var item in RulingSpan.Spans)
             {
                 RenderOne(g, canvas, item, Style, catenary == item);
@@ -71,13 +71,13 @@ namespace JA.CatenarySpans
             
             if (!mouse_dn.IsZero)
             {
-                catenary=RulingSpan.FindCatenaryFromX(mouse_dn.x);
+                catenary=RulingSpan.FindCatenaryFromX(mouse_dn.X);
                 if (catenary!=null)
                 {
-                    double y=catenary.CatenaryFunction(mouse_dn.x);
-                    PointF A=canvas.Map(mouse_dn.x, y);
+                    double y=catenary.CatenaryFunction(mouse_dn.X);
+                    PointF A=canvas.Map(mouse_dn.X, y);
                     PointF M=canvas.Map(mouse_dn);
-                    string text=Math.Abs(y-mouse_dn.y).ToString("0.#");
+                    string text=Math.Abs(y-mouse_dn.Y).ToString("0.#");
                     Style.VerticalArrow(g, M.X, M.Y, A.Y, text, false);
                 }
                 using (Pen pen=Style.MakePen(Color.Red))
@@ -91,7 +91,7 @@ namespace JA.CatenarySpans
 
                     using (Font font=Style.MakeFont(SystemFonts.DialogFont))
                     {
-                        string text=string.Format("x:{0:0}\ny:{1:0.#}", mouse_dn.x, mouse_dn.y);
+                        string text=string.Format("x:{0:0}\ny:{1:0.#}", mouse_dn.X, mouse_dn.Y);
                         StringFormat sf=new StringFormat();                        
                         SizeF sz=g.MeasureString(text, font, M, sf);
 
@@ -144,8 +144,8 @@ namespace JA.CatenarySpans
                 using (Font font=style.MakeFont(SystemFonts.DialogFont))
                 {
 
-                    var txt1=string.Format("{0:0.#}", catenary.StartPosition.y);
-                    var txt2=string.Format("{0:0.#}", catenary.EndPosition.y);
+                    var txt1=string.Format("{0:0.#}", catenary.StartPosition.Y);
+                    var txt2=string.Format("{0:0.#}", catenary.EndPosition.Y);
                     var sf = new StringFormat(style.StringFormat)
                     {
                         FormatFlags = StringFormatFlags.DirectionVertical
@@ -201,7 +201,7 @@ namespace JA.CatenarySpans
 #pragma warning disable S1199 // Nested code blocks should not be used
             {
                 Vector2 d=catenary.SagPosition;
-                double t=(d.x-catenary.StartPosition.x)/catenary.SpanX;
+                double t=(d.X-catenary.StartPosition.X)/catenary.SpanX;
                 Vector2 h=catenary.StartPosition+t*(catenary.EndPosition-catenary.StartPosition);
                 PointF D=canvas.Map(d);
                 PointF H=canvas.Map(h);

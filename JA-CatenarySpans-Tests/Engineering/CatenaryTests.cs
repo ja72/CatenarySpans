@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace JA.Engineering.Tests
+namespace JA.Engineering
 {
     [TestClass]
     public class CatenaryTests
@@ -67,6 +67,24 @@ namespace JA.Engineering.Tests
             double H_expect = 3601.178;
             Assert.AreEqual(H_expect, cat.HorizontalTension, 1e-1);
 
+        }
+
+        [TestMethod]
+        public void Cat_GivenClearance()
+        {
+            double H = 5000.0, w = 0.75, S = 1400, h = -10;
+            var span = new Span(Vector2.UnitY*100, S, h);
+            var cat = new Catenary(span, w, H);
+
+            double C_expect = 64;
+            cat.Clearance = C_expect;
+
+            double H_expect = 5970.4;
+            Assert.AreEqual(H_expect, cat.HorizontalTension, 1e-1);
+
+            cat.SetClearancePoint(new Vector2(300, 60));
+
+            Assert.AreEqual(3278.9, cat.HorizontalTension, 1e-1);
         }
     }
 }

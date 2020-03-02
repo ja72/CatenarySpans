@@ -36,7 +36,7 @@ namespace JA.CatenarySpans
             {
 
                 double dy=rs.ClearanceTo(clearance_pt, false);
-                return footer+string.Format(", Clearance to ({0:0.##},{1:0.##}) is {2:0.###} {3}", clearance_pt.x, clearance_pt.y, dy, lu);
+                return footer+string.Format(", Clearance to ({0:0.##},{1:0.##}) is {2:0.###} {3}", clearance_pt.X, clearance_pt.Y, dy, lu);
             }
             return footer;
         }

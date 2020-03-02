@@ -46,16 +46,16 @@ namespace JA.CatenarySpans
 
             //SetupGridColumnText();
             string path=Properties.Settings.Default.lastSave;
-            if (System.IO.File.Exists(path))
+            if (File.Exists(path))
             {
                 try
                 {
                     RulingSpan=RulingSpan.OpenFile(path);
-                    fileLabelStatusBar.Text=System.IO.Path.GetFileName(path);
+                    fileLabelStatusBar.Text=Path.GetFileName(path);
                 }
                 catch (System.IO.FileLoadException ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
+                    Debug.WriteLine(ex.ToString());
                 }
             }
 
@@ -157,7 +157,7 @@ namespace JA.CatenarySpans
                 }
                 catch (ArgumentException arg)
                 {
-                    System.Diagnostics.Debug.WriteLine(arg.ToString());
+                    Debug.WriteLine(arg.ToString());
                     Properties.Settings.Default.projectUnits=sys.ToString();
                 }
 
@@ -318,11 +318,11 @@ namespace JA.CatenarySpans
                 var tsi=(item as ToolStripItem);
                 if (pu.Equals(tsi.Tag))
                 {
-                    tsi.Image=JA.Properties.Resources.flag_blue;
+                    tsi.Image=Properties.Resources.flag_blue;
                 }
                 else
                 {
-                    tsi.Image=JA.Properties.Resources.flag_green;
+                    tsi.Image=Properties.Resources.flag_green;
                 }
             }
         }
@@ -332,7 +332,7 @@ namespace JA.CatenarySpans
             foreach (var item in unitsDropDown.DropDownItems)
             {
                 var tsi=(item as ToolStripItem);
-                tsi.Image=JA.Properties.Resources.flag_gray;
+                tsi.Image=Properties.Resources.flag_gray;
             }
         }
 
@@ -466,16 +466,16 @@ namespace JA.CatenarySpans
                 Filter = "Span Xml File (*.spanx)|*.spanx|All Files|*.*"
             };
             string path=Properties.Settings.Default.lastSave;
-            if (System.IO.File.Exists(path))
+            if (File.Exists(path))
             {
-                dlg.InitialDirectory=System.IO.Path.GetDirectoryName(path);
-                dlg.FileName=System.IO.Path.GetFileName(path);
+                dlg.InitialDirectory=Path.GetDirectoryName(path);
+                dlg.FileName=Path.GetFileName(path);
             }
             if (dlg.ShowDialog()==DialogResult.OK)
             {
                 RulingSpan=RulingSpan.OpenFile(dlg.FileName);
                 Properties.Settings.Default.lastSave=dlg.FileName;
-                fileLabelStatusBar.Text=System.IO.Path.GetFileName(dlg.FileName);
+                fileLabelStatusBar.Text=Path.GetFileName(dlg.FileName);
             }
 
         }
@@ -488,16 +488,16 @@ namespace JA.CatenarySpans
                 Filter = "Span Xml File (*.spanx)|*.spanx|All Files|*.*"
             };
             string path=Properties.Settings.Default.lastSave;
-            if (System.IO.File.Exists(path))
+            if (File.Exists(path))
             {
-                dlg.InitialDirectory=System.IO.Path.GetDirectoryName(path);
-                dlg.FileName=System.IO.Path.GetFileName(path);
+                dlg.InitialDirectory=Path.GetDirectoryName(path);
+                dlg.FileName=Path.GetFileName(path);
             }
             if (dlg.ShowDialog()==DialogResult.OK)
             {
                 RulingSpan.SaveFile(dlg.FileName);
                 Properties.Settings.Default.lastSave=dlg.FileName;
-                fileLabelStatusBar.Text=System.IO.Path.GetFileName(dlg.FileName);
+                fileLabelStatusBar.Text=Path.GetFileName(dlg.FileName);
             }
         }
 
@@ -613,11 +613,11 @@ namespace JA.CatenarySpans
                 RectangleF target=vis.GetDrawArea(sender as Control);
                 Canvas canvas=vis.GetCanvasFor(target);
                 var mouse_pt=canvas.InvMap(e.Location);
-                var cat=rs.FindCatenaryFromX(mouse_pt.x);
+                var cat=rs.FindCatenaryFromX(mouse_pt.X);
                 int index=rs.Spans.IndexOf(cat);
                 if (index>=0)
                 {
-                    if (e.Button==System.Windows.Forms.MouseButtons.Left)
+                    if (e.Button==MouseButtons.Left)
                     {
                         bool sel=rulingspanDataGrid.Rows[index].Selected;
                         rulingspanDataGrid.Rows[index].Selected=true;
@@ -633,7 +633,7 @@ namespace JA.CatenarySpans
                         }
                         rulingspanDataGrid.Rows[index].Selected=sel;
                     }
-                    else if (e.Button==System.Windows.Forms.MouseButtons.Right)
+                    else if (e.Button==MouseButtons.Right)
                     {
                         bool sel=rulingspanDataGrid.Rows[index].Selected;
                         rulingspanDataGrid.Rows[index].Selected=true;

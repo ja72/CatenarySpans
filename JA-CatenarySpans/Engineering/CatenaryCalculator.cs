@@ -18,9 +18,9 @@ namespace JA.Engineering
         public static Vector2 CenterPosition(Vector2 span, double w, double H)
         {
             double a=H/w;
-            double η=span.x/(2*a);
+            double η=span.X/(2*a);
 
-            double xc=span.x/2+a*DoubleEx.Asinh((span.y*Math.Exp(η))/(a*(1-Math.Exp(2*η))));
+            double xc=span.X/2+a*DoubleEx.Asinh((span.Y*Math.Exp(η))/(a*(1-Math.Exp(2*η))));
             double yc=-a*(Math.Cosh(-xc/a)-1);
 
             return new Vector2(xc, yc);
@@ -36,7 +36,7 @@ namespace JA.Engineering
         public static double MaximumSagX(Vector2 span, Vector2 center, double w, double H)
         {
             double a=H/w;
-            return center.x+a*DoubleEx.Asinh(span.y/span.x);
+            return center.X+a*DoubleEx.Asinh(span.Y/span.X);
         }
 
         /// <summary>
@@ -50,9 +50,9 @@ namespace JA.Engineering
         public static double MaximumSag(Vector2 span, Vector2 center, double w, double H)
         {
             double a=H/w;
-            double x=center.x+a*DoubleEx.Asinh(span.y/span.x);
-            double y=center.y+a*(Math.Cosh((x-center.x)/a)-1);
-            return span.y/span.x*x-y;
+            double x=center.X+a*DoubleEx.Asinh(span.Y/span.X);
+            double y=center.Y+a*(Math.Cosh((x-center.X)/a)-1);
+            return span.Y/span.X*x-y;
         }
         /// <summary>
         /// Calculate the maximum separation from the diagonal (sag point)
@@ -76,7 +76,7 @@ namespace JA.Engineering
         /// <returns>A sag value</returns>
         public static double MidSag(Vector2 span, Vector2 center, double w, double H)
         {
-            return SagAtX(span, center, w, H, span.x/2);
+            return SagAtX(span, center, w, H, span.X/2);
         }
         /// <summary>
         /// Calculate the separation from the diagonal at a specified x-coordinate.
@@ -90,8 +90,8 @@ namespace JA.Engineering
         public static double SagAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
             double a=H/w;
-            double y=center.y+a*(Math.Cosh((x-center.x)/a)-1);
-            return span.y/span.x*x-y;
+            double y=center.Y+a*(Math.Cosh((x-center.X)/a)-1);
+            return span.Y/span.X*x-y;
         }
         /// <summary>
         /// Calculate the separation from the diagonal at a specified x-coordinate. 
@@ -116,7 +116,7 @@ namespace JA.Engineering
         /// <returns>The length value</returns>
         public static double TotalLength(Vector2 span, Vector2 center, double w, double H)
         {
-            return LengthSegmentAtX(span, center, w, H, span.x);
+            return LengthSegmentAtX(span, center, w, H, span.X);
         }
         /// <summary>
         /// Calculate the total length of the curve.
@@ -142,7 +142,7 @@ namespace JA.Engineering
         public static Vector2 PositionAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
             double a=H/w;
-            return new Vector2(x, center.y+a*(Math.Cosh((x-center.x)/a)-1));
+            return new Vector2(x, center.Y+a*(Math.Cosh((x-center.X)/a)-1));
         }
         /// <summary>
         /// Calculate the position on the curve based on paramter <c>t</c> ranging from 0 to 1.
@@ -170,7 +170,7 @@ namespace JA.Engineering
         public static double LengthSegmentAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
             double a=H/w;
-            return a*(Math.Sinh((x-center.x)/a)+Math.Sinh(center.x/a));
+            return a*(Math.Sinh((x-center.X)/a)+Math.Sinh(center.X/a));
         }
         /// <summary>
         /// Calculate the vertical tension value at the x-coordinate specified.
@@ -183,7 +183,7 @@ namespace JA.Engineering
         /// <returns>The vertical tension value</returns>
         public static double VertricalTensionAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
-            return H*Math.Sinh(w*(x-center.x)/H);
+            return H*Math.Sinh(w*(x-center.X)/H);
         }
         /// <summary>
         /// Calculate the total tension value at the x-coordinate specified.
@@ -196,7 +196,7 @@ namespace JA.Engineering
         /// <returns>The total tension value</returns>
         public static double TotalTensionAtX(Vector2 span, Vector2 center, double w, double H, double x)
         {
-            return H*Math.Cosh(w*(x-center.x)/H);
+            return H*Math.Cosh(w*(x-center.X)/H);
         }
         /// <summary>
         /// Calculate the avarage tension along the curve, averaged across the length of the curve.
@@ -208,8 +208,8 @@ namespace JA.Engineering
         /// <returns>The average tension value</returns>
         public static double AverageTension(Vector2 span, Vector2 center, double w, double H)
         {
-            double ξ=center.x/span.x;
-            double η=w*span.x/(2*H);
+            double ξ=center.X/span.X;
+            double η=w*span.X/(2*H);
             return H*(η+0.25*(Math.Sinh(4*η*(1-ξ))+Math.Sinh(4*η*ξ)))/(Math.Sinh(2*η*(1-ξ))+Math.Sinh(2*η*ξ));
         }
         /// <summary>
@@ -245,7 +245,7 @@ namespace JA.Engineering
         {
             if (tol<=0) tol=1e-8;
             P=Math.Max(P, MinTension);
-            double σ=span.x*w;
+            double σ=span.X*w;
             double H_init=P/2+Math.Sqrt(DoubleEx.Sqr(P/2)-DoubleEx.Sqr(σ)/24);
 
             Func<double, double> f=(H_) => AverageTension(span, w, H_);
@@ -267,7 +267,7 @@ namespace JA.Engineering
         {
             if (tol<=0) tol=1e-4;
             D=Math.Max(D, MinSag);
-            double H_init=DoubleEx.Sqr(span.x)*w/(8*D);
+            double H_init=DoubleEx.Sqr(span.X)*w/(8*D);
 
             Func<double, double> f=(H_) => MaximumSag(span, w, H_);
 
@@ -313,7 +313,7 @@ namespace JA.Engineering
         {
             if (tol<=0) tol=1e-4;
             D=Math.Max(D, MinSag);
-            double H_init=(span.x*w/2)*x*(span.x-x)/(D*span.x-x*span.y);
+            double H_init=(span.X*w/2)*x*(span.X-x)/(D*span.X-x*span.Y);
 
             Func<double, double> f=(H_) => SagAtX(span, w, H_, x);
 
@@ -336,8 +336,8 @@ namespace JA.Engineering
         {
             if (tol<=0) tol=1e-4;
             C=Math.Max(C, MinSag);
-            double H_init=DoubleEx.Sqr(span.x)*w/(8*C);
-            Func<double, double> f=(H_) => -CenterPosition(span, w, H_).y;
+            double H_init=DoubleEx.Sqr(span.X)*w/(8*C);
+            Func<double, double> f=(H_) => -CenterPosition(span, w, H_).Y;
 
             if (f.Bisection(C, H_init, tol, out double H))
             {
@@ -360,7 +360,7 @@ namespace JA.Engineering
         {
             double a=H/w;
             double L=TotalLength(span, center, w, H);
-            return center.x+a*DoubleEx.Asinh(t*L/a-Math.Sinh(center.x/a));
+            return center.X+a*DoubleEx.Asinh(t*L/a-Math.Sinh(center.X/a));
         }
         
         #endregion

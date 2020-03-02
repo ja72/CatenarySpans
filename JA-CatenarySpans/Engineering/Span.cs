@@ -52,6 +52,12 @@ namespace JA.Engineering
             this.step=other.Step;
             this.RaisesChangedEvents=true;
         }
+        public Span(Span previous, double dx, double dy)
+        {
+            this.start = previous.EndPosition;
+            this.step = new Vector2(dx, dy);
+            this.RaisesChangedEvents = true;
+        }
         #endregion
 
         #region Properties
@@ -59,16 +65,16 @@ namespace JA.Engineering
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.Yes)]
         public virtual bool IsOK
         {
-            get { return step.x.IsFinite()&&step.x.IsPositive(); }
+            get { return step.X.IsFinite()&&step.X.IsPositive(); }
         }
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 StartPosition { get { return start; } set { start=value; } }
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 EndPosition { get { return start+step; } }
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
-        public Vector2 StartBase { get { return new Vector2(start.x, 0); } }
+        public Vector2 StartBase { get { return new Vector2(start.X, 0); } }
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
-        public Vector2 EndBase { get { return new Vector2(start.x+step.x, 0); } }
+        public Vector2 EndBase { get { return new Vector2(start.X+step.X, 0); } }
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 Step
         {
@@ -87,22 +93,39 @@ namespace JA.Engineering
             }
         }
         [RefreshProperties(RefreshProperties.None), XmlAttribute()]
-        public double StartX { get { return start.x; } set { start.x=value; } }
+        public double StartX
+        {
+            get { return start.X; }
+            set
+            {
+                //start.x=value;
+                start = new Vector2(value, start.Y);
+            }
+        }
         [RefreshProperties(RefreshProperties.None), XmlAttribute()]
-        public double StartY { get { return start.y; } set { start.y=value; } }
+        public double StartY
+        {
+            get { return start.Y; }
+            set
+            {
+                //start.y=value;
+                start = new Vector2(start.X, value);
+            }
+        }
         [RefreshProperties(RefreshProperties.All), XmlAttribute()]
         public double SpanX
         {
-            get { return step.x; }
+            get { return step.X; }
             set
             {
                 if (value.IsNotFinite()||value.IsNegativeOrZero())
                 {
                     throw new ArgumentException("Span must be finite and positive.");
                 }
-                if (!step.y.Equals(value))
+                if (!step.Y.Equals(value))
                 {
-                    step.x=value;
+                    //step.x=value;
+                    step = new Vector2(value, step.Y);
                     if (RaisesChangedEvents)
                     {
                         OnSpanChanged(new EventArgs<Span>(this));
@@ -114,16 +137,17 @@ namespace JA.Engineering
         [RefreshProperties(RefreshProperties.All), XmlAttribute()]
         public double SpanY
         {
-            get { return step.y; }
+            get { return step.Y; }
             set
             {
                 if (value.IsNotFinite())
                 {
                     throw new ArgumentException("Span height must be finite.");
                 }
-                if (!step.y.Equals(value))
+                if (!step.Y.Equals(value))
                 {
-                    step.y=value;
+                    //step.y=value;
+                    step = new Vector2(step.X, value);
                     if (RaisesChangedEvents)
                     {
                         OnSpanChanged(new EventArgs<Span>(this));
@@ -145,7 +169,7 @@ namespace JA.Engineering
         {
             get
             {
-                return (x) => start.y+x*step.y/step.x;
+                return (x) => start.Y+x*step.Y/step.X;
             }
         }
         [XmlIgnore(), Browsable(false), Bindable(BindableSupport.No)]
@@ -153,7 +177,7 @@ namespace JA.Engineering
         {
             get
             {
-                return (t) => new Vector2(start.x+step.x*t, start.y+step.y*t);
+                return (t) => new Vector2(start.X+step.X*t, start.Y+step.Y*t);
             }
         }
         #endregion
@@ -180,18 +204,24 @@ namespace JA.Engineering
                 minPosition=StartBase;
                 maxPosition=EndBase;
             }
-            minPosition.y=Math.Min(minPosition.y, start.y);
-            minPosition.y=Math.Min(minPosition.y, start.y+step.y);
-            maxPosition.y=Math.Max(maxPosition.y, start.y);
-            maxPosition.y=Math.Max(maxPosition.y, start.y+step.y);
-            minPosition.x=Math.Min(minPosition.x, start.x);
-            minPosition.x=Math.Min(minPosition.x, start.x+step.x);
-            maxPosition.x=Math.Max(maxPosition.x, start.x);
-            maxPosition.x=Math.Max(maxPosition.x, start.x+step.x);
+            double minx = minPosition.X, miny = minPosition.Y;
+            double maxx = maxPosition.X, maxy = maxPosition.Y;
+
+            miny=Math.Min(miny, start.Y);
+            miny=Math.Min(miny, start.Y+step.Y);
+            maxy=Math.Max(maxy, start.Y);
+            maxy=Math.Max(maxy, start.Y+step.Y);
+            minx=Math.Min(minx, start.X);
+            minx=Math.Min(minx, start.X+step.X);
+            maxx=Math.Max(maxx, start.X);
+            maxx=Math.Max(maxx, start.X+step.X);
+
+            minPosition = new Vector2(minx, miny);
+            maxPosition = new Vector2(maxx, maxy);
         }
         public bool ContainsX(double x)
         {
-            return start.x<=x&&step.x>=(x-start.x);
+            return start.X<=x&&step.X>=(x-start.X);
         }
         #endregion
 

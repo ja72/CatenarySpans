@@ -46,16 +46,51 @@ namespace JA.Engineering
             spans.RaiseListChangedEvents=true;
             OnRulingSpanChange(new ItemChangeEventArgs());
         }
+        public RulingSpan(ProjectUnits units) : this()
+        {
+            this.units=units;
+        }
         public RulingSpan(ProjectUnits units, params Catenary[] list) : this()
         {
             //Set Units
             this.units=units;            
             this.AddArray(list);
         }
+        public RulingSpan(ProjectUnits units, params Span[] list) : this()
+        {
+            this.units=units;
+            AddArray(list);
+        }
+        public void AddArray(params Span[] list)
+        {
+            var wt = Catenary.DefaultWeight;
+            var H = Catenary.DefaultHorizontalTension;
+            Catenary last = null;
+            if (spans.Count>0)
+            {
+                last = spans.Last();
+                wt = last.Weight;
+                H = last.HorizontalTension;
+            }
+            spans.RaiseListChangedEvents=false;
+            for(int i=0; i<list.Length; i++)
+            {
+                var cat = new Catenary(list[i], wt, H);
+                if (last!=null)
+                {
+                    cat.StartPosition = last.EndPosition;
+                }
+                spans.Add(cat);
+                last = cat;
+            }
+            spans.RaiseListChangedEvents=true;
+
+            OnRulingSpanChange(new ItemChangeEventArgs());
+        }
         public void AddArray(params Catenary[] list)
         {
             spans.RaiseListChangedEvents=false;
-            for(int i=0; i<list.Length; i++)
+            for (int i = 0; i<list.Length; i++)
             {
                 spans.Add(list[i]);
             }
@@ -119,32 +154,39 @@ namespace JA.Engineering
         {
             for(int i=0; i<spans.Count; i++)
             {
-                this[i].CalculateCenter();
+                spans[i].CalculateCenter();
             }
         }
         public void UpdateSpanEnds()
         {
             for(int i=1; i<spans.Count; i++)
             {
-                this[i].StartPosition=this[i-1].EndPosition;
+                spans[i].StartPosition=this[i-1].EndPosition;
             }            
+        }
+        public void SetCableWeight(double wt)
+        {
+            for (int i = 0; i<spans.Count; i++)
+            {
+                spans[i].Weight = wt;
+            }
         }
         public void SetHorizontalTension(double H)
         {
             for(int i=0; i<spans.Count; i++)
             {
-                this[i].HorizontalTension=H;
+                spans[i].HorizontalTension=H;
             }
             UpdateSpanEnds();
         }
         public void SetHorizontalTensionFrom(int span_index)
         {
-            double H=this[span_index].HorizontalTension;
+            double H=spans[span_index].HorizontalTension;
             for(int i=0; i<spans.Count; i++)
             {
                 if(i!=span_index)
                 {
-                    this[i].HorizontalTension=H;
+                    spans[i].HorizontalTension=H;
                 }
             }
             UpdateSpanEnds();
@@ -163,10 +205,10 @@ namespace JA.Engineering
 
         public double ClearanceTo(Vector2 point, bool directional)
         {
-            Catenary catenary=FindCatenaryFromX(point.x);
+            Catenary catenary=FindCatenaryFromX(point.X);
             if(catenary!=null)
             {
-                double dy=catenary.CatenaryFunction(point.x)-point.y;
+                double dy=catenary.CatenaryFunction(point.X)-point.Y;
                 return directional?dy:Math.Abs(dy);
             }
             return 0;

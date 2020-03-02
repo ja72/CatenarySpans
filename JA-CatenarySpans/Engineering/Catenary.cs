@@ -99,25 +99,25 @@ namespace JA.Engineering
 
         [ReadOnly(true), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
-        public double CenterX { get { return StartPosition.X+center.x; } }
+        public double CenterX { get { return StartPosition.X+center.X; } }
         [ReadOnly(true), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double CenterY
         {
-            get { return StartPosition.Y+center.y; }
+            get { return StartPosition.Y+center.Y; }
         }
         [RefreshProperties(RefreshProperties.All), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double Clearance
         {
-            get { return IsCenterInSpan?StartPosition.y+center.y:Math.Min(StartPosition.y, EndPosition.y); }
+            get { return IsCenterInSpan?StartPosition.Y+center.Y:Math.Min(StartPosition.Y, EndPosition.Y); }
             set
             {
                 if (value.IsNotFinite()||IsUpliftCondition)
                 {
                     throw new ArgumentException("Clerance must be finite and lowest point must be in span.");
                 }
-                HorizontalTension=CatenaryCalculator.SetClearance(Step, weight, StartPosition.y-value, 1e-3);
+                HorizontalTension=CatenaryCalculator.SetClearance(Step, weight, StartPosition.Y-value, 1e-3);
             }
         }
 
@@ -181,7 +181,7 @@ namespace JA.Engineering
                 {
                     throw new ArgumentException("Eta must be finite and positive.");
                 }
-                HorizontalTension=weight*Step.x/(2*value);
+                HorizontalTension=weight*Step.X/(2*value);
             }
         }
         [RefreshProperties(RefreshProperties.All), XmlAttribute()]
@@ -279,7 +279,7 @@ namespace JA.Engineering
         {
             get
             {
-                return center.x<=SpanX/2?
+                return center.X<=SpanX/2?
                     CatenaryCalculator.TotalTensionAtX(Step, center, weight, horizontalTension, 0):
                     CatenaryCalculator.TotalTensionAtX(Step, center, weight, horizontalTension, SpanX);
             }
@@ -314,7 +314,7 @@ namespace JA.Engineering
         {
             get
             {
-                double L=CatenaryCalculator.LengthSegmentAtX(Step, center, weight, horizontalTension, center.x);
+                double L=CatenaryCalculator.LengthSegmentAtX(Step, center, weight, horizontalTension, center.X);
                 return L>=0&&L<=CatenaryCalculator.TotalLength(Step, center, weight, horizontalTension);
             }
         }
@@ -376,17 +376,24 @@ namespace JA.Engineering
             {
                 double t=(double)(i)/N;
                 Vector2 pos=f(t);
-                minPosition.x=Math.Min(minPosition.x, pos.x);
-                minPosition.y=Math.Min(minPosition.y, pos.y);
-                maxPosition.x=Math.Max(maxPosition.x, pos.x);
-                maxPosition.y=Math.Max(maxPosition.y, pos.y);
+                double minx = minPosition.X, miny = minPosition.Y;
+                double maxx = maxPosition.X, maxy = maxPosition.Y;
+
+                minx=Math.Min(minx, pos.X);
+                miny=Math.Min(miny, pos.Y);
+                maxx=Math.Max(maxx, pos.X);
+                maxy=Math.Max(maxy, pos.Y);
+
+                minPosition = new Vector2(minx, miny);
+                maxPosition = new Vector2(maxx, maxy);
+
             }
         }
 
         public void SetClearancePoint(Vector2 point)
         {
-            double x=point.x-StartPosition.x;
-            double D=StartPosition.y+SpanY/SpanX*x-point.y;
+            double x=point.X-StartPosition.X;
+            double D=StartPosition.Y+SpanY/SpanX*x-point.Y;
             HorizontalTension=CatenaryCalculator.SetSagAtX(Step, weight, D, x, 1e-3);
         }
 
@@ -414,7 +421,7 @@ namespace JA.Engineering
         {
             get
             {
-                return (x) => StartPosition.y+CatenaryCalculator.PositionAtX(Step, center, weight, horizontalTension, x-StartPosition.x).y;
+                return (x) => StartPosition.Y+CatenaryCalculator.PositionAtX(Step, center, weight, horizontalTension, x-StartPosition.X).Y;
             }
         }
 
