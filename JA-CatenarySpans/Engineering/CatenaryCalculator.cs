@@ -335,7 +335,7 @@ namespace JA.Engineering
         public static double SetClearance(Vector2 span, double w, double C, double tol)
         {
             if (tol<=0) tol=1e-4;
-            C=Math.Min(C, MinSag);
+            C=Math.Max(C, MinSag);
             double H_init=DoubleEx.Sqr(span.x)*w/(8*C);
             Func<double, double> f=(H_) => -CenterPosition(span, w, H_).y;
 
