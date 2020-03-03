@@ -396,7 +396,7 @@ namespace JA.Engineering
             return Clone();
         }
 
-        #endregion
+        #endregion        
 
     }
 

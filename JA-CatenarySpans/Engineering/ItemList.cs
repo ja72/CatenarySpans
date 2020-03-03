@@ -11,7 +11,6 @@ namespace JA.Engineering
         where T : new()
     {
         ProjectUnits units;
-        readonly BindingList<T> items;
 
         public event EventHandler<ItemChangeEventArgs> ItemChanged;
         public event EventHandler<ProjectUnits.SetEventArgs> ProjectUnitsSet;
@@ -22,7 +21,7 @@ namespace JA.Engineering
         public ItemList()
         {
             this.units=new ProjectUnits();
-            this.items = new BindingList<T>
+            this.Items = new BindingList<T>
             {
                 AllowNew = true,
                 AllowRemove = true,
@@ -30,8 +29,8 @@ namespace JA.Engineering
             };
 
             //Item Events
-            this.items.AddingNew+=new AddingNewEventHandler(items_AddingNew);
-            this.items.ListChanged+=new ListChangedEventHandler(items_ListChanged);
+            this.Items.AddingNew+=new AddingNewEventHandler(items_AddingNew);
+            this.Items.ListChanged+=new ListChangedEventHandler(items_ListChanged);
             //Units Events
             this.ProjectUnitsChanged+=new EventHandler<ProjectUnits.ChangeEventArgs>(BindableList_ProjectUnitsChanged);
 
@@ -44,12 +43,12 @@ namespace JA.Engineering
 
         public void AddArray(params T[] list)
         {
-            items.RaiseListChangedEvents=false;
+            Items.RaiseListChangedEvents=false;
             for (int i=0; i<list.Length; i++)
             {
-                items.Add(list[i]);
+                Items.Add(list[i]);
             }
-            items.RaiseListChangedEvents=true;
+            Items.RaiseListChangedEvents=true;
 
             OnItemChanged(new ItemChangeEventArgs());
         }
@@ -61,13 +60,14 @@ namespace JA.Engineering
         }
 
         #endregion
+
         #region Properties
         public T this[int index]
         {
-            get { return items[index]; }
+            get { return Items[index]; }
             set
             {
-                items[index]=value;
+                Items[index]=value;
             }
         }
 
@@ -103,29 +103,37 @@ namespace JA.Engineering
         [XmlArray("Items"), Browsable(true), DisplayName("Items")]
         public T[] ItemArray
         {
-            get { return items.ToArray(); }
+            get { return Items.ToArray(); }
             set
             {
-                items.Clear();
+                Items.Clear();
                 foreach (var item in value)
                 {
-                    items.Add(item);
+                    Items.Add(item);
                 }
             }
         }
 
         [XmlIgnore(), Browsable(false)]
-        public BindingList<T> Items
-        {
-            get { return items; }
-        }
+        public BindingList<T> Items { get; }
 
         [XmlIgnore()]
-        public T First { get { return items.Count>0?this[0]:default(T); } }
+        public T First
+        {
+            get { return Items.Count>0 
+                    ? this[0] 
+                    : default; }
+        }
         [XmlIgnore()]
-        public T Last { get { return items.Count>0?this[items.Count-1]:default(T); } }
-        public bool HasItems { get { return items.Count>0; } }
+        public T Last
+        {
+            get { return Items.Count>0 
+                    ? this[Items.Count-1] 
+                    : default; }
+        }
+        public bool HasItems { get { return Items.Count>0; } }
         #endregion
+
         #region Internal Event Handlers
         void BindableList_ProjectUnitsChanged(object sender, ProjectUnits.ChangeEventArgs e)
         {
@@ -156,6 +164,7 @@ namespace JA.Engineering
         }
 
         #endregion
+
         #region Event Triggers
 
         protected void OnItemChanged(ItemChangeEventArgs e)
@@ -172,6 +181,7 @@ namespace JA.Engineering
             this.ProjectUnitsChanged?.Invoke(this, e);
         }
         #endregion
+
         public class ItemChangeEventArgs : EventArgs
         {
             readonly int index;

@@ -9,22 +9,26 @@ using System.Collections;
 
 namespace JA
 {
-    public interface IVector2 : ICollection<double>, ICollection
+    public interface IVector<T> : ICollection<T>, ICollection
     {
         bool IsZero { get; }
+        T[] ToArray();
+        new int Count { get; }
+    }
+    public interface IVector2 : IVector<double>
+    {
         double Manitude { get; }
         double X { get; }
         double Y { get; }
     }
 
-    [DebuggerDisplay("({X},{Y})")]
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public struct Vector2 : 
+    public readonly struct Vector2 : 
         IVector2, 
         IEquatable<Vector2>, 
         IFormattable
     {
-        public static string DefaultFormat="0.###";
+        public static readonly string DefaultFormat="0.###";
 
         #region Factory
         [DebuggerStepThrough()]
@@ -174,17 +178,21 @@ namespace JA
 
         public double[] ToArray() => new[] { X, Y };
 
-        public void Add(double item)
+        void ICollection<double>.Add(double item)
         {
             throw new NotSupportedException();
         }
 
-        public void Clear()
+        void ICollection<double>.Clear()
         {
             throw new NotSupportedException();
         }
 
         public bool Contains(double item)
+        {
+            throw new NotSupportedException();
+        }
+        bool ICollection<double>.Remove(double item)
         {
             throw new NotSupportedException();
         }
@@ -197,14 +205,11 @@ namespace JA
         {
             Array.Copy(ToArray(), 0, array, arrayIndex, Count);
         }
-
-        public bool Remove(double item)
-        {
-            throw new NotSupportedException();
-        }
+        int ICollection.Count => Count;
+        int ICollection<double>.Count => Count;
+        public int Count { get => 2; }
         object ICollection.SyncRoot => null;
         bool ICollection.IsSynchronized => false;
-        public int Count { get => 2; }
         public bool IsReadOnly { get => true; }
         #endregion
     }

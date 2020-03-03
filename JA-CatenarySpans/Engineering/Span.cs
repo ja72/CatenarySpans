@@ -223,6 +223,8 @@ namespace JA.Engineering
         {
             return start.X<=x&&step.X>=(x-start.X);
         }
+
+        
         #endregion
 
         #region ICloneable Members

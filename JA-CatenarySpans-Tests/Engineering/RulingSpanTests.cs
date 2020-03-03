@@ -44,5 +44,35 @@ namespace JA.Engineering
             }
 
         }
+
+        [TestMethod]
+        public void RS_SaveAndLoad()
+        {
+            var span1 = new Span(Vector2.UnitY*100, 650, 20);
+            var span2 = new Span(span1, 1250, -12);
+            var span3 = new Span(span2, 800, -16);
+
+            const int H = 3200;
+            const double Wt = 0.75;
+
+            var rs = new RulingSpan(ProjectUnits.Default, span1, span2, span3);
+            rs.SetCableWeight(Wt);
+            rs.SetHorizontalTension(H);
+
+            const string file = "rs_save.spanx";
+            rs.SaveFile(file);
+
+            rs = RulingSpan.OpenFile(file);
+
+            Assert.AreEqual(3, rs.Spans.Count);
+            
+            Assert.AreEqual(ProjectUnits.Default.ToString(), rs.UnitSymbols);
+            Assert.AreEqual(H, rs.HorizontalTension);
+            for (int i = 0; i < rs.Spans.Count; i++)
+            {
+                Assert.AreEqual(Wt, rs[i].Weight);
+            }
+
+        }
     }
 }

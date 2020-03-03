@@ -25,9 +25,8 @@ namespace JA.Engineering
         Default=Engineering
     }
 
-    [DebuggerDisplay("{ToString()}")]
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public struct EngValue : IEquatable<num>, ICloneable
+    public readonly struct EngValue : IEquatable<num>, ICloneable
     {
         public static readonly string DefaultFormat="g";
 
@@ -140,7 +139,7 @@ namespace JA.Engineering
         /// <summary>
         /// The value exponent
         /// </summary>
-        public int Exponent { get; private set; }
+        public int Exponent { get; }
         /// <summary>
         /// The value sign
         /// </summary>
@@ -248,7 +247,7 @@ namespace JA.Engineering
         public string ToString(int max_width, int significant_digits)
         {
             int expsign=Math.Sign(Exponent);
-            Exponent=Math.Abs(Exponent);
+            int exp=Math.Abs(Exponent);
             int digits=Scalar>0?(int)Math.Log10(Scalar)+1:0;
             int decimals=Math.Max(significant_digits-digits, 0);
             double round=Math.Pow(10, -decimals);
@@ -256,33 +255,33 @@ namespace JA.Engineering
             decimals=Math.Max(significant_digits-digits, 0);
             string t;
             string f="0:F";
-            if (Exponent==0)
+            if (exp==0)
             {
                 t=string.Format("{"+f+decimals+"}", Sign*Scalar);
             }
-            else if (SI.ContainsKey(expsign*Exponent))
+            else if (SI.ContainsKey(expsign*exp))
             {
-                t=string.Format("{"+f+decimals+"}{1}", Sign*Scalar, SI[expsign*Exponent]);
+                t=string.Format("{"+f+decimals+"}{1}", Sign*Scalar, SI[expsign*exp]);
             }
             else
             {
-                t=string.Format("{"+f+decimals+"}e{1}", Sign*Scalar, expsign*Exponent);
+                t=string.Format("{"+f+decimals+"}e{1}", Sign*Scalar, expsign*exp);
             }
             // Adjust decimal digits to fit column
             if (t.Length>max_width&&max_width!=0)
             {
                 decimals=Math.Max(0, decimals-t.Length+max_width);
-                if (Exponent==0)
+                if (exp==0)
                 {
                     t=string.Format("{"+f+decimals+"}", Sign*Scalar);
                 }
-                else if (SI.ContainsKey(expsign*Exponent))
+                else if (SI.ContainsKey(expsign*exp))
                 {
-                    t=string.Format("{"+f+decimals+"}{1}", Sign*Scalar, SI[expsign*Exponent]);
+                    t=string.Format("{"+f+decimals+"}{1}", Sign*Scalar, SI[expsign*exp]);
                 }
                 else
                 {
-                    t=string.Format("{"+f+decimals+"}e{1}", Sign*Scalar, expsign*Exponent);
+                    t=string.Format("{"+f+decimals+"}e{1}", Sign*Scalar, expsign*exp);
                 }
             }
             return t;

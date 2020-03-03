@@ -5,21 +5,25 @@ using System.Text;
 
 namespace JA
 {
-    public struct IntRange : IEnumerable<int>
+    public readonly struct IntRange : IVector<int>
     {
-        readonly int offset, count, stride;
         public IntRange(int offset, int count, int stride)
         {
-            this.offset=offset;
-            this.count=count;
-            this.stride=stride;
+            this.Start=offset;
+            this.Count=count;
+            this.Stride=stride;
         }
-        public static IntRange Empty=new IntRange();
-        public bool IsEmpty { get { return count==0; } }
-        public int Start { get { return offset; } }
-        public int Count { get { return count; } }
-        public int Stride { get { return stride; } }
-        public int End { get { return offset+count*stride; } }
+#pragma warning disable S2386 // Mutable fields should not be "public static"
+#pragma warning disable S3887 // Mutable, non-private fields should not be "readonly"
+        public static readonly IntRange Empty=new IntRange();
+#pragma warning restore S3887 // Mutable, non-private fields should not be "readonly"
+#pragma warning restore S2386 // Mutable fields should not be "public static"
+
+        public bool IsEmpty { get { return Count==0; } }
+        public int Start { get; }
+        public int Count { get; }
+        public int Stride { get; }
+        public int End { get { return Start+Count*Stride; } }
         public static IntRange Span(int count)
         {
             return new IntRange(0, count, 1);
@@ -31,7 +35,17 @@ namespace JA
 
         public int this[int index]
         {
-            get { return offset+index*stride; }
+            get { return Start+index*Stride; }
+        }
+
+        public int[] ToArray()
+        {
+            int[] array = new int[Count];
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = Start + i*Stride;
+            }
+            return array;
         }
 
         public static implicit operator IntRange(int index)
@@ -41,28 +55,28 @@ namespace JA
 
         public static IntRange operator>>(IntRange range, int end)
         {
-            return new IntRange(range.offset, (end-range.offset)/range.stride, range.stride);
+            return new IntRange(range.Start, (end-range.Start)/range.Stride, range.Stride);
         }
         public static IntRange operator<<(IntRange range, int start)
         {
-            return new IntRange(start, (range.End-start)/range.stride, -range.stride);
+            return new IntRange(start, (range.End-start)/range.Stride, -range.Stride);
         }
         public static IntRange operator+(IntRange range, int count)
         {
-            return new IntRange(range.offset, count, range.count);
+            return new IntRange(range.Start, count, range.Count);
         }
         public static IntRange operator*(IntRange range, int stride)
         {
-            return new IntRange(range.offset, range.count, stride);
+            return new IntRange(range.Start, range.Count, stride);
         }
 
         #region IEnumerable<int> Members
 
         public IEnumerator<int> GetEnumerator()
         {
-            for (int i=0; i<count; i++)
+            for (int i=0; i<Count; i++)
             {
-                yield return offset+i*stride;
+                yield return Start+i*Stride;
             }
         }
 
@@ -70,6 +84,54 @@ namespace JA
         {
             return GetEnumerator();
         }
+
+        void ICollection<int>.Add(int item)
+        {
+            throw new NotSupportedException();
+        }
+
+        void ICollection<int>.Clear()
+        {
+            throw new NotSupportedException();
+        }
+        bool ICollection<int>.Remove(int item)
+        {
+            throw new NotSupportedException();
+        }
+        public bool IsZero => Start==0 && Count==0 && Stride==0;
+        public bool Contains(int item)
+        {
+            // Start + index*Stride = item
+            int index;
+            if (Stride==1)
+            {
+                index = item-Start;
+                return index>=0 && index<Count;
+            }
+            else if (Stride!=0)
+            {
+                index = Math.DivRem(item-Start, Stride, out int remain);
+                return remain==0 && index>=0 && index<Count;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void CopyTo(int[] array, int arrayIndex)
+        {
+            Array.Copy(ToArray(), 0, array, arrayIndex, Count);
+        }
+        public void CopyTo(Array array, int arrayIndex)
+        {
+            Array.Copy(ToArray(), 0, array, arrayIndex, Count);
+        }
+        int System.Collections.ICollection.Count => Count;
+        int ICollection<int>.Count => Count;
+        public bool IsReadOnly { get => true; }
+        bool System.Collections.ICollection.IsSynchronized => false;
+        object System.Collections.ICollection.SyncRoot => null;
 
         #endregion
     }
