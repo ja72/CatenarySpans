@@ -75,7 +75,7 @@ namespace JA.CatenarySpans
             {
                 var mi=item.ToMenuItem(icon_green, (tsi, pev) =>
                     {
-                        rs.Units=pev.NewProjectUnits;
+                        rs.SetProjectUnits(pev.NewProjectUnits);
                         unitsDropDown.Text=rs.Units.ToString();
                         RefreshAndPaintGrid();
                     });

@@ -48,7 +48,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>latest</LangVersion>
-    <CodeAnalysisRuleSet>..\..\..\Source\JA\JA.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\JA.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -120,6 +120,7 @@
     </Compile>
     <Compile Include="CatenarySpans\CatenaryGraphics.cs" />
     <Compile Include="Engineering\EngValue.cs" />
+    <Compile Include="Engineering\Material.cs" />
     <Compile Include="Engineering\ProjectUnits.cs" />
     <Compile Include="Engineering\RulingSpan.cs" />
     <Compile Include="Engineering\Span.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Ex.cs" />
     <Compile Include="Gdi\Colors.cs" />
     <Compile Include="Gdi\Canvas.cs" />
+    <Compile Include="Gdi\GdiEx.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IntRange.cs" />
     <Compile Include="Printing\Printables.cs" />

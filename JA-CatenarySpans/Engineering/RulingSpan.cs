@@ -7,20 +7,15 @@ using System.Xml.Serialization;
 
 namespace JA.Engineering
 {    
-    public sealed class RulingSpan : IHasUnits, IListSource, ICloneable
+    public sealed class RulingSpan : HasUnitsBase, IContainsMeasures,  IListSource, ICloneable
     {
-        ProjectUnits units;
-        readonly BindingList<Catenary> spans;
-
         public event EventHandler<ItemChangeEventArgs> RulingSpanChanged;
-        public event EventHandler<ProjectUnits.SetEventArgs> ProjectUnitsSet;
-        public event EventHandler<ProjectUnits.ChangeEventArgs> ProjectUnitsChanged;
 
         #region Factory
-        public RulingSpan()
+        public RulingSpan() : this(new ProjectUnits(ProjectUnitSystem.FeetPoundSecond)) { }
+        public RulingSpan(ProjectUnits units) : base(units)
         {
-            this.units=new ProjectUnits(ProjectUnitSystem.FeetPoundSecond);
-            this.spans = new BindingList<Catenary>
+            this.Spans = new BindingList<Catenary>
             {
                 AllowNew = true,
                 AllowRemove = true,
@@ -28,37 +23,29 @@ namespace JA.Engineering
                 RaiseListChangedEvents = true
             };
             //Span Events
-            this.spans.AddingNew+=new AddingNewEventHandler(spans_AddingNew);
-            this.spans.ListChanged+=new ListChangedEventHandler(spans_ListChanged);            
+            this.Spans.AddingNew+=new AddingNewEventHandler(spans_AddingNew);
+            this.Spans.ListChanged+=new ListChangedEventHandler(spans_ListChanged);            
             
             //Ruling Span Events
             this.RulingSpanChanged+=new EventHandler<ItemChangeEventArgs>(RulingSpan_RulingSpanChanged);
-            this.ProjectUnitsChanged+=new EventHandler<ProjectUnits.ChangeEventArgs>(RulingSpan_ProjectUnitsChanged);
         }
-        public RulingSpan(RulingSpan other) : this()
+        public RulingSpan(RulingSpan other) : this(other.Units.Clone())
         {
-            this.units=other.units.Clone();
-            spans.RaiseListChangedEvents=false;
-            for (int i=0; i<other.spans.Count; i++)
+            RaiseListChangedEvents=false;
+            for (int i=0; i<other.Spans.Count; i++)
             {
-                spans.Add(other.spans[i].Clone());
+                Spans.Add(other.Spans[i].Clone());
             }
-            spans.RaiseListChangedEvents=true;
+            RaiseListChangedEvents=true;
             OnRulingSpanChange(new ItemChangeEventArgs());
         }
-        public RulingSpan(ProjectUnits units) : this()
-        {
-            this.units=units;
-        }
-        public RulingSpan(ProjectUnits units, params Catenary[] list) : this()
+        public RulingSpan(ProjectUnits units, params Catenary[] list) : this(units)
         {
             //Set Units
-            this.units=units;            
             this.AddArray(list);
         }
-        public RulingSpan(ProjectUnits units, params Span[] list) : this()
+        public RulingSpan(ProjectUnits units, params Span[] list) : this(units)
         {
-            this.units=units;
             AddArray(list);
         }
         public void AddArray(params Span[] list)
@@ -66,13 +53,13 @@ namespace JA.Engineering
             var wt = Catenary.DefaultWeight;
             var H = Catenary.DefaultHorizontalTension;
             Catenary last = null;
-            if (spans.Count>0)
+            if (Spans.Count>0)
             {
-                last = spans.Last();
+                last = Spans.Last();
                 wt = last.Weight;
                 H = last.HorizontalTension;
             }
-            spans.RaiseListChangedEvents=false;
+            RaiseListChangedEvents=false;
             for(int i=0; i<list.Length; i++)
             {
                 var cat = new Catenary(list[i], wt, H);
@@ -80,21 +67,21 @@ namespace JA.Engineering
                 {
                     cat.StartPosition = last.EndPosition;
                 }
-                spans.Add(cat);
+                Spans.Add(cat);
                 last = cat;
             }
-            spans.RaiseListChangedEvents=true;
+            RaiseListChangedEvents=true;
 
             OnRulingSpanChange(new ItemChangeEventArgs());
         }
         public void AddArray(params Catenary[] list)
         {
-            spans.RaiseListChangedEvents=false;
+            RaiseListChangedEvents=false;
             for (int i = 0; i<list.Length; i++)
             {
-                spans.Add(list[i]);
+                Spans.Add(list[i]);
             }
-            spans.RaiseListChangedEvents=true;
+            RaiseListChangedEvents=true;
 
             OnRulingSpanChange(new ItemChangeEventArgs());
         }
@@ -118,7 +105,7 @@ namespace JA.Engineering
         public Catenary GetRulingSpanCatenary()
         {
             var rs= new Span(Vector2.Origin, RulingSpanLength ,0);
-            return new Catenary(rs, spans[0].Weight, spans[0].HorizontalTension);
+            return new Catenary(rs, Spans[0].Weight, Spans[0].HorizontalTension);
         }
 
         /// <summary>
@@ -130,10 +117,10 @@ namespace JA.Engineering
             {
                 var rs1=0.0;
                 var rs2=0.0;
-                for (int i=0; i<spans.Count; i++)
+                for (int i=0; i<Spans.Count; i++)
                 {
-                    double δx=spans[i].SpanX;
-                    double δy=spans[i].SpanY;
+                    double δx=Spans[i].SpanX;
+                    double δy=Spans[i].SpanY;
                     rs1+=Math.Pow(δx, 3);
                     double slope=δy/δx;
                     rs2+=δx*Math.Pow(1+slope*slope, 1.5);
@@ -144,56 +131,56 @@ namespace JA.Engineering
 
         public void UpdateAllFromFrom(int span_index)
         {
-            if (span_index>=0&&span_index<=spans.Count)
+            if (span_index>=0&&span_index<=Spans.Count)
             {
-                HorizontalTension=spans[span_index].HorizontalTension;
+                HorizontalTension=Spans[span_index].HorizontalTension;
             }
         }
 
         public void UpdateAllCatenary()
         {
-            for(int i=0; i<spans.Count; i++)
+            for(int i=0; i<Spans.Count; i++)
             {
-                spans[i].CalculateCenter();
+                Spans[i].CalculateCenter();
             }
         }
         public void UpdateSpanEnds()
         {
-            for(int i=1; i<spans.Count; i++)
+            for(int i=1; i<Spans.Count; i++)
             {
-                spans[i].StartPosition=this[i-1].EndPosition;
+                Spans[i].StartPosition=this[i-1].EndPosition;
             }            
         }
         public void SetCableWeight(double wt)
         {
-            for (int i = 0; i<spans.Count; i++)
+            for (int i = 0; i<Spans.Count; i++)
             {
-                spans[i].Weight = wt;
+                Spans[i].Weight = wt;
             }
         }
         public void SetHorizontalTension(double H)
         {
-            for(int i=0; i<spans.Count; i++)
+            for(int i=0; i<Spans.Count; i++)
             {
-                spans[i].HorizontalTension=H;
+                Spans[i].HorizontalTension=H;
             }
             UpdateSpanEnds();
         }
         public void SetHorizontalTensionFrom(int span_index)
         {
-            double H=spans[span_index].HorizontalTension;
-            for(int i=0; i<spans.Count; i++)
+            double H=Spans[span_index].HorizontalTension;
+            for(int i=0; i<Spans.Count; i++)
             {
                 if(i!=span_index)
                 {
-                    spans[i].HorizontalTension=H;
+                    Spans[i].HorizontalTension=H;
                 }
             }
             UpdateSpanEnds();
         }
         public Catenary FindCatenaryFromX(double x)
         {
-            foreach(var item in spans)
+            foreach(var item in Spans)
             {
                 if(item.ContainsX(x))
                 {
@@ -213,72 +200,61 @@ namespace JA.Engineering
             }
             return 0;
         }
+        protected override void ConvertUnits(ProjectUnits target)
+        {
+            ScaleForUnits(new ProjectUnits.ChangeEventArgs(Units, target), false);
+        }
+        public void ScaleForUnits(ProjectUnits.ChangeEventArgs g, bool raiseEvents = false)
+        {
+            var raise = RaiseListChangedEvents;
+            this.RaiseListChangedEvents = raiseEvents;
+            for (int i = 0; i < Spans.Count; i++)
+            {
+                Spans[i].ScaleForUnits(g, raise);
+            }
+            this.HorizontalTension *= g.ForceFactor;
+            this.RaiseListChangedEvents = raise;
+        }
+        void IContainsMeasures.ScaleForUnits(ProjectUnits.ChangeEventArgs g) => ScaleForUnits(g);
 
         #endregion
 
         #region Properties
+        [XmlIgnore(), Bindable(BindableSupport.No)]
+        public bool RaiseListChangedEvents { 
+            get => Spans.RaiseListChangedEvents; 
+            set => Spans.RaiseListChangedEvents = value; }
+
         public Catenary this[int index]
         {
-            get { return spans[index]; }
+            get { return Spans[index]; }
             set
             {
-                spans[index]=value;
-            }
-        }
-
-        [XmlAttribute(), Bindable(BindableSupport.No), Browsable(false)]
-        public string UnitSymbols
-        {
-            get { return units.ToString(); }
-            set { Units=ProjectUnits.Parse(value); }
-        }
-
-        [XmlIgnore(), TypeConverter(typeof(ProjectUnits.UnitsTypeConverter))]
-        public ProjectUnits Units
-        {
-            get { return units; }
-            set
-            {
-                if(units==null)
-                {
-                    // Project Units Set
-                    this.units=value;
-                    OnProjectUnitsSet(new ProjectUnits.SetEventArgs(value));
-                }
-                else
-                {
-                    // Project Units Changed
-                    ProjectUnits old_units=units;
-                    this.units=value;
-                    OnProjectUnitsChange(new ProjectUnits.ChangeEventArgs(old_units, value));
-                }
+                Spans[index]=value;
             }
         }
 
         [XmlArray("Spans"), Browsable(true), DisplayName("Spans")]
         public Catenary[] SpanArray
         {
-            get { return spans.ToArray(); }
+            get { return Spans.ToArray(); }
             set
             {
-                spans.Clear();
+                Spans.Clear();
                 foreach (var item in value)
                 {
-                    spans.Add(item);
+                    Spans.Add(item);
                 }
             }
         }
 
         [XmlIgnore(), Browsable(false)]
-        public BindingList<Catenary> Spans
-        {
-            get { return spans; }
-        }
+        public BindingList<Catenary> Spans { get; }
 
         [XmlIgnore()]
-        public Catenary First { get { return spans.Count>0?this[0]:null; } }
+        public Catenary First { get { return Spans.Count>0?this[0]:null; } }
         [XmlIgnore()]
-        public Catenary Last { get { return spans.Count>0?this[spans.Count-1]:null; } }
+        public Catenary Last { get { return Spans.Count>0?this[Spans.Count-1]:null; } }
 
         [TypeConverter(typeof(System.ComponentModel.DoubleConverter))]        
         [XmlIgnore(), Bindable(BindableSupport.Yes), DisplayName("TotalLength")]
@@ -289,45 +265,45 @@ namespace JA.Engineering
         [XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public double TotalLength
         {
-            get { return spans.Sum((cat) => cat.TotalLength); }
+            get { return Spans.Sum((cat) => cat.TotalLength); }
         }
         [XmlIgnore(), Bindable(BindableSupport.Yes), DisplayName("HorizontalTension")]
         public string HorizontalTensionDisplay
         {
-            get { return string.Format("{0:0.###} {1}", HorizontalTension, units.Force); }
+            get { return string.Format("{0:0.###} {1}", HorizontalTension, Units.Force); }
             set
             {
                 string[] parts = value.Split(' ');
-                Unit unit=units.ForceUnit;
+                Unit unit=Units.ForceUnit;
                 if(parts.Length>1)
                 {
                     unit=parts[1];
                 }
-                if(!units.ForceUnit.IsCompatible(unit))
+                if(!Units.ForceUnit.IsCompatible(unit))
                 {
                     return;
                 }
                 if(double.TryParse(parts[0], out double x))
                 {
-                    HorizontalTension=unit.FactorTo(units.ForceUnit)*x;
+                    HorizontalTension=unit.FactorTo(Units.ForceUnit)*x;
                 }
             }
         }
         [XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public double HorizontalTension
         {
-            get { return HasSpans?spans[0].HorizontalTension:0; }
+            get { return HasSpans?Spans[0].HorizontalTension:0; }
             set
             {
                 if(HasSpans)
                 { 
-                    spans[0].HorizontalTension=value;
+                    Spans[0].HorizontalTension=value;
                     OnRulingSpanChange(new ItemChangeEventArgs(0));
                 }
             }
         }
         [XmlIgnore(), Bindable(BindableSupport.No)]
-        public bool HasSpans { get { return spans.Count>0; } }
+        public bool HasSpans { get { return Spans.Count>0; } }
         #endregion
 
         #region Span Event Handlers
@@ -370,23 +346,6 @@ namespace JA.Engineering
 
         #endregion
 
-        #region Unit Event Handlers
-        void RulingSpan_ProjectUnitsChanged(object sender, ProjectUnits.ChangeEventArgs e)
-        {
-            for(int i=0; i<spans.Count; i++)
-            {
-                this[i].RaisesChangedEvents=false;
-                this[i].StartPosition*=e.LengthFactor;
-                this[i].Step*=e.LengthFactor;
-                this[i].HorizontalTension*=e.ForceFactor;
-                this[i].Weight*=e.ForceFactor/e.LengthFactor;
-                this[i].RaisesChangedEvents=true;
-            }
-            OnRulingSpanChange(new ItemChangeEventArgs());
-        }
-
-        #endregion
-
         #region Event Triggers
 
         void OnRulingSpanChange(ItemChangeEventArgs e)
@@ -394,14 +353,6 @@ namespace JA.Engineering
             this.RulingSpanChanged?.Invoke(this, e);
         }
 
-        void OnProjectUnitsSet(ProjectUnits.SetEventArgs e)
-        {
-            this.ProjectUnitsSet?.Invoke(this, e);
-        }
-        void OnProjectUnitsChange(ProjectUnits.ChangeEventArgs e)
-        {
-            this.ProjectUnitsChanged?.Invoke(this, e);
-        }
         #endregion
 
         #region File I/O
@@ -448,7 +399,7 @@ namespace JA.Engineering
 
         System.Collections.IList IListSource.GetList()
         {
-            return spans;
+            return Spans;
         }
 
         #endregion

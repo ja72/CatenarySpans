@@ -113,17 +113,20 @@ namespace JA.CatenarySpans
             PointF C=canvas.Map(catenary.LowestPosition);
             PointF C0=canvas.Map(new Vector2(catenary.CenterX, 0));
             SizeF em;
-            // Ground
-            using (Font font=style.MakeFont(SystemFonts.DialogFont))
+            if (A0.IsFinite() && B0.IsFinite() && A.IsFinite() && B.IsFinite())
             {
-                g.DrawLine(Pens.Black, A0, B0);
-                var txt=string.Format("{0:0.#}", catenary.SpanX);
-                em=g.MeasureString("M", font);
-                float y=canvas.Target.Top+em.Height;
-                style.HorizontalArrow(g, y, A.X, B.X, txt, true);
-                g.DrawLine(Pens.Black, A.X, A.Y-style.PointWidth/2, A.X, y-0.75f*em.Height);
-                g.DrawLine(Pens.Black, B.X, B.Y-style.PointWidth/2, B.X, y-0.75f*em.Height);
-            }
+                // Ground
+                using (Font font = style.MakeFont(SystemFonts.DialogFont))
+                {
+                    g.DrawLine(Pens.Black, A0, B0);
+                    var txt = string.Format("{0:0.#}", catenary.SpanX);
+                    em=g.MeasureString("M", font);
+                    float y = canvas.Target.Top+em.Height;
+                    style.HorizontalArrow(g, y, A.X, B.X, txt, true);
+                    g.DrawLine(Pens.Black, A.X, A.Y-style.PointWidth/2, A.X, y-0.75f*em.Height);
+                    g.DrawLine(Pens.Black, B.X, B.Y-style.PointWidth/2, B.X, y-0.75f*em.Height);
+                }
+            
             // Top dimensions
 
             // Diagonals
@@ -132,33 +135,35 @@ namespace JA.CatenarySpans
                 pen.DashStyle=System.Drawing.Drawing2D.DashStyle.Dash;
                 g.DrawLine(pen, A, B);
             }
-            // Poles
-            using (Pen pen=style.MakePen(Color.BurlyWood))
-            {
-                pen.Width=3;
-
-                g.DrawLine(pen, A0, A);
-                g.DrawLine(pen, A0.X-4, A0.Y, A0.X+4, A0.Y);
-                g.DrawLine(pen, B0, B);
-                g.DrawLine(pen, B0.X-4, B0.Y, B0.X+4, B0.Y);
-                using (Font font=style.MakeFont(SystemFonts.DialogFont))
+                // Poles
+                using (Pen pen = style.MakePen(Color.BurlyWood))
                 {
+                    pen.Width=3;
 
-                    var txt1=string.Format("{0:0.#}", catenary.StartPosition.Y);
-                    var txt2=string.Format("{0:0.#}", catenary.EndPosition.Y);
-                    var sf = new StringFormat(style.StringFormat)
+                    g.DrawLine(pen, A0, A);
+                    g.DrawLine(pen, A0.X-4, A0.Y, A0.X+4, A0.Y);
+                    g.DrawLine(pen, B0, B);
+                    g.DrawLine(pen, B0.X-4, B0.Y, B0.X+4, B0.Y);
+                    using (Font font = style.MakeFont(SystemFonts.DialogFont))
                     {
-                        FormatFlags = StringFormatFlags.DirectionVertical
-                    };
-                    SizeF sz1=g.MeasureString(txt1, font, A0, sf);
-                    SizeF sz2=g.MeasureString(txt2, font, B0, sf);
 
-                    g.DrawString(txt1, font, Brushes.Black, A0.X-sz1.Width/2, A0.Y+style.PointWidth/2);
-                    g.DrawString(txt2, font, Brushes.Black, B0.X-sz2.Width/2, B0.Y+style.PointWidth/2);
+                        var txt1 = string.Format("{0:0.#}", catenary.StartPosition.Y);
+                        var txt2 = string.Format("{0:0.#}", catenary.EndPosition.Y);
+                        var sf = new StringFormat(style.StringFormat)
+                        {
+                            FormatFlags = StringFormatFlags.DirectionVertical
+                        };
+                        SizeF sz1 = g.MeasureString(txt1, font, A0, sf);
+                        SizeF sz2 = g.MeasureString(txt2, font, B0, sf);
+
+                        g.DrawString(txt1, font, Brushes.Black, A0.X-sz1.Width/2, A0.Y+style.PointWidth/2);
+                        g.DrawString(txt2, font, Brushes.Black, B0.X-sz2.Width/2, B0.Y+style.PointWidth/2);
+                    }
                 }
             }
             // Curves
             Func<double, Vector2> f=catenary.ParametricCurve;
+            bool finite = true;
             using (Pen pen=style.MakePen(Color.Blue))
             {
                 const int N=64;
@@ -166,49 +171,62 @@ namespace JA.CatenarySpans
                 for (int i=0; i<=N; i++)
                 {
                     points[i]=canvas.Map(f(((double)i)/N));
+                    if (!points[i].IsFinite())
+                    {
+                        finite = false;
+                        break;
+                    }
                 }
                 pen.Width=selected?4f:style.PenWidth;
-                g.DrawCurve(pen, points);
-            }
-            // Points
-            using (SolidBrush brush=style.MakeSolidBrush(Color.Red))
-            {
-                g.FillEllipse(brush, A.X-style.PointWidth/2, A.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
-                g.FillEllipse(brush, B.X-style.PointWidth/2, B.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
-                if (catenary.IsCenterInSpan)
+                if (finite)
                 {
-                    brush.Color=Color.Plum;
-                    g.FillEllipse(brush, C.X-style.PointWidth/2, C.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+                    g.DrawCurve(pen, points);
                 }
             }
-            // Clearance
-
-
-            using (Pen pen=style.MakePen(Color.Black))
+            if (A.IsFinite() && B.IsFinite() && C.IsFinite())
             {
-                g.DrawEllipse(pen, A.X-style.PointWidth/2, A.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
-                g.DrawEllipse(pen, B.X-style.PointWidth/2, B.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
-                if (catenary.IsCenterInSpan)
+                // Points
+                using (SolidBrush brush = style.MakeSolidBrush(Color.Red))
                 {
-                    g.DrawEllipse(pen, C.X-style.PointWidth/2, C.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+                    g.FillEllipse(brush, A.X-style.PointWidth/2, A.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+                    g.FillEllipse(brush, B.X-style.PointWidth/2, B.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+                    if (catenary.IsCenterInSpan)
+                    {
+                        brush.Color=Color.Plum;
+                        g.FillEllipse(brush, C.X-style.PointWidth/2, C.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+                    }
+                }
+                // Clearance
 
-                    var txt=string.Format("{0:0.#}", catenary.CenterY);
-                    style.VerticalArrow(g, C.X, C0.Y, C.Y+style.PointWidth/2, txt, false);
 
+                using (Pen pen = style.MakePen(Color.Black))
+                {
+                    g.DrawEllipse(pen, A.X-style.PointWidth/2, A.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+                    g.DrawEllipse(pen, B.X-style.PointWidth/2, B.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+                    if (catenary.IsCenterInSpan)
+                    {
+                        g.DrawEllipse(pen, C.X-style.PointWidth/2, C.Y-style.PointWidth/2, style.PointWidth, style.PointWidth);
+
+                        var txt = string.Format("{0:0.#}", catenary.CenterY);
+                        style.VerticalArrow(g, C.X, C0.Y, C.Y+style.PointWidth/2, txt, false);
+
+                    }
                 }
             }
             // Sag
-#pragma warning disable S1199 // Nested code blocks should not be used
+            if(catenary.IsOK)
             {
                 Vector2 d=catenary.SagPosition;
                 double t=(d.X-catenary.StartPosition.X)/catenary.SpanX;
                 Vector2 h=catenary.StartPosition+t*(catenary.EndPosition-catenary.StartPosition);
                 PointF D=canvas.Map(d);
                 PointF H=canvas.Map(h);
-                var txt=string.Format("{0:0.#}", catenary.MaximumSag);
-                style.VerticalArrow(g, D.X, H.Y, D.Y, txt, false);
+                if (D.IsFinite() && H.IsFinite())
+                {
+                    var txt = string.Format("{0:0.#}", catenary.MaximumSag);
+                    style.VerticalArrow(g, D.X, H.Y, D.Y, txt, false);
+                }
             }
-#pragma warning restore S1199 // Nested code blocks should not be used
         }
         #endregion
 

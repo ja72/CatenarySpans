@@ -14,10 +14,20 @@ namespace JA.Engineering
         double Weight { get; }
     }
 
-    public class Cable : ICable, ICloneable
+    public class Cable : ICable, ICloneable, IEquatable<Cable>
     {
 
         #region Factory
+        public Cable(double dia, params (Alloy alloy, double area)[] layers)
+        {
+            this.Diameter=  dia;
+            foreach (var (alloy, area) in layers)
+            {
+                this.Area += area;
+                this.Weight += 12*alloy.Density*area;
+                this.RatedStrength += area*alloy.YieldStrength;
+            }
+        }
         public Cable(double area, double dia, double wt, double rts)
         {
             this.Area = area;
@@ -31,7 +41,7 @@ namespace JA.Engineering
         { }
 
         public Cable(Cable other)
-            : this(other.Area, other.Diameter, other.Weight, other.RatedStrength)
+            : this(other as ICable)
         { }
         #endregion
 
@@ -47,6 +57,33 @@ namespace JA.Engineering
         object ICloneable.Clone() { return Clone(); }
         #endregion
 
+        public override bool Equals(object obj)
+        {
+            if (obj is Cable cable)
+            {
+                return Equals(cable);
+            }
+            return false;
+        }
+        public bool Equals(Cable other)
+        {
+            return Area.Equals(other.Area)
+                && Diameter.Equals(other.Diameter)
+                && Weight.Equals(other.Weight)
+                && RatedStrength.Equals(other.RatedStrength);
+        }
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hc = 17*23;
+                hc = 23*hc + Area.GetHashCode();
+                hc = 23*hc + Diameter.GetHashCode();
+                hc = 23*hc + Weight.GetHashCode();
+                hc = 23*hc + RatedStrength.GetHashCode();
+                return hc;
+            }
+        }
     }
 
 }

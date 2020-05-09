@@ -23,6 +23,7 @@ namespace JA.Engineering
     /// <summary>
     /// NewtonMeterSecond,
     /// NewtonMillimeterSecond,
+    /// KiloNetwonMeterSecond,
     /// InchPoundSecond,
     /// FeetPoundSecond,
     /// InchOunceSecond,
@@ -32,6 +33,7 @@ namespace JA.Engineering
     {
         NewtonMeterSecond,
         NewtonMillimeterSecond,
+        KiloNetwonMeterSecond,
         InchPoundSecond,
         FeetPoundSecond,
         InchOunceSecond,
@@ -59,6 +61,7 @@ namespace JA.Engineering
         public static readonly Unit oz = (1 / 16.0) * lbm;
         public static readonly Unit gee = 9.80665 * m / (s ^ 2);
         public static readonly Unit N = kg * m / (s ^ 2);
+        public static readonly Unit kN = 1000.0* N;
         public static readonly Unit kgf = kg * gee;
         public static readonly Unit tonne = 1000.0 * kg;
         public static readonly Unit ton = 2000.0 * lbm;
@@ -167,7 +170,11 @@ namespace JA.Engineering
             }
             throw new ArgumentException("Units must be combatible for conversion.");
         }
-
+        /// <summary>
+        /// Check for equality between units (when overriden)
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public abstract bool Equals(Unit other);
         /// <summary>
         /// Equality overrides from <see cref="System.Object"/>

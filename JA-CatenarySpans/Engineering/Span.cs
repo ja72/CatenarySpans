@@ -9,23 +9,21 @@ using System.Diagnostics;
 namespace JA.Engineering
 {
 
-    public interface ISpan
+    public interface ISpan : IContainsMeasures
     {
         Vector2 StartPosition { get; set; }
         Vector2 EndPosition { get; }
-        Vector2 Step { get; set; }
+        Vector2 Step { get; }
         bool IsOK { get; }
     }
 
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Span : ISpan, INotifyPropertyChanged, ICloneable, IFormattable
     {
-        public static string DefaultLengthFormat="0.###";
-        public static double DefaultSpanLength=500;
-        public static double DefaultTowerHeight=100;
-        public static double DefaultSpanRise=50;
-
-        Vector2 start;
+        public static readonly string DefaultLengthFormat="0.###";
+        public static readonly double DefaultSpanLength=500;
+        public static readonly double DefaultTowerHeight=100;
+        public static readonly double DefaultSpanRise=50;
         Vector2 step;
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventArgs<Span>.Handler SpanChanged;
@@ -42,19 +40,19 @@ namespace JA.Engineering
         { }
         public Span(Vector2 origin, Vector2 span)
         {
-            this.start=origin;
+            this.StartPosition=origin;
             this.step=span;
             this.RaisesChangedEvents=true;
         }
         public Span(ISpan other)
         {
-            this.start=other.StartPosition;
+            this.StartPosition=other.StartPosition;
             this.step=other.Step;
             this.RaisesChangedEvents=true;
         }
         public Span(Span previous, double dx, double dy)
         {
-            this.start = previous.EndPosition;
+            this.StartPosition = previous.EndPosition;
             this.step = new Vector2(dx, dy);
             this.RaisesChangedEvents = true;
         }
@@ -63,23 +61,20 @@ namespace JA.Engineering
         #region Properties
 
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.Yes)]
-        public virtual bool IsOK
-        {
-            get { return step.X.IsFinite()&&step.X.IsPositive(); }
-        }
+        public virtual bool IsOK => step.X.IsFinite()&&step.X.IsPositive();
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
-        public Vector2 StartPosition { get { return start; } set { start=value; } }
+        public Vector2 StartPosition { get; set; }
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
-        public Vector2 EndPosition { get { return start+step; } }
+        public Vector2 EndPosition => StartPosition+step;
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
-        public Vector2 StartBase { get { return new Vector2(start.X, 0); } }
+        public Vector2 StartBase => new Vector2(StartPosition.X, 0);
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
-        public Vector2 EndBase { get { return new Vector2(start.X+step.X, 0); } }
+        public Vector2 EndBase => new Vector2(StartPosition.X+step.X, 0);
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 Step
         {
-            get { return step; }
-            set
+            get => step;
+            private set
             {
                 if (!step.Equals(value))
                 {
@@ -95,27 +90,23 @@ namespace JA.Engineering
         [RefreshProperties(RefreshProperties.None), XmlAttribute()]
         public double StartX
         {
-            get { return start.X; }
-            set
-            {
+            get => StartPosition.X;
+            set =>
                 //start.x=value;
-                start = new Vector2(value, start.Y);
-            }
+                StartPosition = new Vector2(value, StartPosition.Y);
         }
         [RefreshProperties(RefreshProperties.None), XmlAttribute()]
         public double StartY
         {
-            get { return start.Y; }
-            set
-            {
+            get => StartPosition.Y;
+            set =>
                 //start.y=value;
-                start = new Vector2(start.X, value);
-            }
+                StartPosition = new Vector2(StartPosition.X, value);
         }
         [RefreshProperties(RefreshProperties.All), XmlAttribute()]
         public double SpanX
         {
-            get { return step.X; }
+            get => step.X;
             set
             {
                 if (value.IsNotFinite()||value.IsNegativeOrZero())
@@ -137,7 +128,7 @@ namespace JA.Engineering
         [RefreshProperties(RefreshProperties.All), XmlAttribute()]
         public double SpanY
         {
-            get { return step.Y; }
+            get => step.Y;
             set
             {
                 if (value.IsNotFinite())
@@ -157,29 +148,11 @@ namespace JA.Engineering
             }
         }
         [ReadOnly(true), RefreshProperties(RefreshProperties.None), XmlIgnore()]
-        public double SpanLength
-        {
-            get
-            {
-                return step.Manitude;
-            }
-        }
+        public double SpanLength => step.Manitude;
         [XmlIgnore(), Browsable(false), Bindable(BindableSupport.No)]
-        public Func<double, double> DiagonalFunction
-        {
-            get
-            {
-                return (x) => start.Y+x*step.Y/step.X;
-            }
-        }
+        public Func<double, double> DiagonalFunction => (x) => StartPosition.Y+x*step.Y/step.X;
         [XmlIgnore(), Browsable(false), Bindable(BindableSupport.No)]
-        public Func<double, Vector2> ParametricDiagonal
-        {
-            get
-            {
-                return (t) => new Vector2(start.X+step.X*t, start.Y+step.Y*t);
-            }
-        }
+        public Func<double, Vector2> ParametricDiagonal => (t) => new Vector2(StartPosition.X+step.X*t, StartPosition.Y+step.Y*t);
         #endregion
 
         #region Event Triggers
@@ -207,21 +180,21 @@ namespace JA.Engineering
             double minx = minPosition.X, miny = minPosition.Y;
             double maxx = maxPosition.X, maxy = maxPosition.Y;
 
-            miny=Math.Min(miny, start.Y);
-            miny=Math.Min(miny, start.Y+step.Y);
-            maxy=Math.Max(maxy, start.Y);
-            maxy=Math.Max(maxy, start.Y+step.Y);
-            minx=Math.Min(minx, start.X);
-            minx=Math.Min(minx, start.X+step.X);
-            maxx=Math.Max(maxx, start.X);
-            maxx=Math.Max(maxx, start.X+step.X);
+            miny=Math.Min(miny, StartPosition.Y);
+            miny=Math.Min(miny, StartPosition.Y+step.Y);
+            maxy=Math.Max(maxy, StartPosition.Y);
+            maxy=Math.Max(maxy, StartPosition.Y+step.Y);
+            minx=Math.Min(minx, StartPosition.X);
+            minx=Math.Min(minx, StartPosition.X+step.X);
+            maxx=Math.Max(maxx, StartPosition.X);
+            maxx=Math.Max(maxx, StartPosition.X+step.X);
 
             minPosition = new Vector2(minx, miny);
             maxPosition = new Vector2(maxx, maxy);
         }
         public bool ContainsX(double x)
         {
-            return start.X<=x&&step.X>=(x-start.X);
+            return StartPosition.X<=x&&step.X>=(x-StartPosition.X);
         }
 
         
@@ -248,7 +221,7 @@ namespace JA.Engineering
         public string ToString(string format, IFormatProvider provider)
         {
             return string.Format("Start={0}, Step={1}",
-                start.ToString(format, provider),
+                StartPosition.ToString(format, provider),
                 step.ToString(format, provider));
         }
         #endregion
@@ -269,6 +242,18 @@ namespace JA.Engineering
             this.PropertyChanged?.Invoke(this, e);
         }
 
+        public virtual void ScaleForUnits(ProjectUnits.ChangeEventArgs g, bool raiseEvents = false)
+        {
+            var raise = RaisesChangedEvents;
+            this.RaisesChangedEvents = raiseEvents;
+
+            this.StartPosition *= g.LengthFactor;
+            this.Step *= g.LengthFactor;
+
+            this.RaisesChangedEvents = raise;
+        }
+        void IContainsMeasures.ScaleForUnits(ProjectUnits.ChangeEventArgs g) => ScaleForUnits(g);
+
         #endregion
 
     }
@@ -280,14 +265,22 @@ namespace JA.Engineering
         public SpanListBase()
         {
             this.ItemChanged+=new EventHandler<ItemChangeEventArgs>(SpanList_ItemChanged);
-            this.ProjectUnitsChanged+=new EventHandler<ProjectUnits.ChangeEventArgs>(SpanListBase_ProjectUnitsChanged);
         }
 
         public SpanListBase(ProjectUnits units, params T[] items)
             : base(units, items)
         {
             this.ItemChanged+=new EventHandler<ItemChangeEventArgs>(SpanList_ItemChanged);
-            this.ProjectUnitsChanged+=new EventHandler<ProjectUnits.ChangeEventArgs>(SpanListBase_ProjectUnitsChanged);
+        }
+
+        protected override void ConvertUnits(ProjectUnits target)
+        {
+            var g = new ProjectUnits.ChangeEventArgs(Units, target);
+            for (int i = 0; i < Items.Count; i++)
+            {
+                this[i].ScaleForUnits(g);
+            }
+            OnItemChanged(new ItemChangeEventArgs());
         }
 
         void SpanList_ItemChanged(object sender, ItemChangeEventArgs e)
@@ -295,19 +288,19 @@ namespace JA.Engineering
             UpdateSpanEnds();
         }
 
-        void SpanListBase_ProjectUnitsChanged(object sender, ProjectUnits.ChangeEventArgs e)
-        {
-            for (int i=0; i<Items.Count; i++)
-            {
-                this[i].RaisesChangedEvents=false;
-                this[i].StartPosition*=e.LengthFactor;
-                this[i].Step*=e.LengthFactor;
-                //this[i].HorizontalTension*=e.ForceFactor;
-                //this[i].Weight*=e.ForceFactor/e.LengthFactor;
-                this[i].RaisesChangedEvents=true;
-            }
-            OnItemChanged(new ItemChangeEventArgs());
-        }
+        //void SpanListBase_ProjectUnitsChanged(object sender, ProjectUnits.ChangeEventArgs e)
+        //{
+        //    for (int i=0; i<Items.Count; i++)
+        //    {
+        //        this[i].RaisesChangedEvents=false;
+        //        this[i].StartPosition*=e.LengthFactor;
+        //        this[i].Step*=e.LengthFactor;
+        //        this[i].HorizontalTension*=e.ForceFactor;
+        //        this[i].Weight*=e.ForceFactor/e.LengthFactor;
+        //        this[i].RaisesChangedEvents=true;
+        //    }
+        //    OnItemChanged(new ItemChangeEventArgs());
+        //}
 
         public void UpdateSpanEnds()
         {

@@ -11,17 +11,21 @@ using System.Globalization;
 namespace JA.Engineering
 {
 
-    public interface IHasUnits
+    public interface IContainsMeasures
     {
-        [XmlIgnore(), Bindable(BindableSupport.Yes)]
-        ProjectUnits Units { get; set; }
-        [XmlAttribute(), Bindable(BindableSupport.No)]
-        string UnitSymbols { get; set; }
+        void ScaleForUnits(ProjectUnits.ChangeEventArgs g);
     }
 
-#pragma warning disable S4035 // Classes implementing "IEquatable<T>" should be sealed
+    public interface IHasUnits
+    {
+        [XmlAttribute(), Bindable(BindableSupport.No)]
+        string UnitSymbols { get; set; }
+        [XmlIgnore(), Bindable(BindableSupport.Yes)]
+        ProjectUnits Units { get; }
+        void SetProjectUnits(ProjectUnits target);
+    }
+
     public class ProjectUnits : IEquatable<ProjectUnits>, ICloneable
-#pragma warning restore S4035 // Classes implementing "IEquatable<T>" should be sealed
     {
 
         public static readonly ProjectUnitSystem DefaultUnitSystem = ProjectUnitSystem.FeetPoundSecond;
@@ -55,6 +59,12 @@ namespace JA.Engineering
                     length_sym="mm";
                     mass_sym="kg";
                     force_sym="N";
+                    break;
+                case ProjectUnitSystem.KiloNetwonMeterSecond:
+                    time_sym="s";
+                    length_sym="m";
+                    mass_sym="kg";
+                    force_sym="kN";
                     break;
                 case ProjectUnitSystem.InchPoundSecond:
                     time_sym="s";
@@ -217,10 +227,14 @@ namespace JA.Engineering
         {
             get
             {
-                var vals = (ProjectUnitSystem[])Enum.GetValues(typeof(ProjectUnitSystem));
-#pragma warning disable S2365 // Properties should not make collection or array copies
+                var vals = new ProjectUnitSystem[] 
+                {
+                    ProjectUnitSystem.FeetPoundSecond,
+                    ProjectUnitSystem.NewtonMeterSecond,
+                    ProjectUnitSystem.InchOunceSecond,
+                }; 
+                //vals = (ProjectUnitSystem[])Enum.GetValues(typeof(ProjectUnitSystem));
                 return vals.Select((en) => new ProjectUnits(en)).ToArray();
-#pragma warning restore S2365 // Properties should not make collection or array copies
             }
         }
 
@@ -400,4 +414,63 @@ namespace JA.Engineering
 
     }
 
+    #region HasUnitsBase
+
+    public abstract class HasUnitsBase : IHasUnits
+    {
+        public void SetProjectUnits(ProjectUnits target)
+        {
+            if (Units == null)
+            {
+                OnProjectUnitsSet(new ProjectUnits.SetEventArgs(target));
+                this.Units = target;
+            }
+            else if (!Units.Equals(target))
+            {
+                OnProjectUnitsChange(new ProjectUnits.ChangeEventArgs(Units, target));
+                ConvertUnits(target);
+                this.Units = target;
+            }
+        }
+        protected abstract void ConvertUnits(ProjectUnits target);
+
+        #region Factory
+        protected HasUnitsBase()
+        {
+            Units = new ProjectUnits();
+        }
+        protected HasUnitsBase(ProjectUnits units)
+        {
+            this.Units = units;
+        }
+        #endregion
+
+        #region Events
+        public event EventHandler<ProjectUnits.SetEventArgs> ProjectUnitsSet;
+        public event EventHandler<ProjectUnits.ChangeEventArgs> ProjectUnitsChanged;
+        protected void OnProjectUnitsSet(ProjectUnits.SetEventArgs e)
+        {
+            this.ProjectUnitsSet?.Invoke(this, e);
+        }
+        protected void OnProjectUnitsChange(ProjectUnits.ChangeEventArgs e)
+        {
+            this.ProjectUnitsChanged?.Invoke(this, e);
+        }
+
+        #endregion
+
+        #region Properties
+        [XmlAttribute(), Bindable(BindableSupport.No), Browsable(false)]
+        public string UnitSymbols
+        {
+            get { return Units.ToString(); }
+            set { SetProjectUnits(ProjectUnits.Parse(value)); }
+        }
+
+        [XmlIgnore(), TypeConverter(typeof(ProjectUnits.UnitsTypeConverter))]
+        public ProjectUnits Units { get; private set; }
+
+        #endregion
+    }
+    #endregion
 }

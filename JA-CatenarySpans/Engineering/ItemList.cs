@@ -7,20 +7,16 @@ using System.Xml.Serialization;
 
 namespace JA.Engineering
 {
-    public class ItemList<T> : IHasUnits
+    public abstract class ItemList<T> : HasUnitsBase
         where T : new()
     {
-        ProjectUnits units;
 
         public event EventHandler<ItemChangeEventArgs> ItemChanged;
-        public event EventHandler<ProjectUnits.SetEventArgs> ProjectUnitsSet;
-        public event EventHandler<ProjectUnits.ChangeEventArgs> ProjectUnitsChanged;
 
-        #region Factory
+        #region Factory        
 
-        public ItemList()
+        public ItemList() : base()
         {
-            this.units=new ProjectUnits();
             this.Items = new BindingList<T>
             {
                 AllowNew = true,
@@ -35,9 +31,21 @@ namespace JA.Engineering
             this.ProjectUnitsChanged+=new EventHandler<ProjectUnits.ChangeEventArgs>(BindableList_ProjectUnitsChanged);
 
         }
-        public ItemList(ProjectUnits units, params T[] items) : this()
+        public ItemList(ProjectUnits units, params T[] items) : base(units)
         {
-            this.units=new ProjectUnits();
+            this.Items = new BindingList<T>
+            {
+                AllowNew = true,
+                AllowRemove = true,
+                AllowEdit = true
+            };
+
+            //Item Events
+            this.Items.AddingNew+=new AddingNewEventHandler(items_AddingNew);
+            this.Items.ListChanged+=new ListChangedEventHandler(items_ListChanged);
+            //Units Events
+            this.ProjectUnitsChanged+=new EventHandler<ProjectUnits.ChangeEventArgs>(BindableList_ProjectUnitsChanged);
+
             this.AddArray(items);
         }
 
@@ -68,35 +76,6 @@ namespace JA.Engineering
             set
             {
                 Items[index]=value;
-            }
-        }
-
-        [XmlAttribute(), Bindable(BindableSupport.No), Browsable(false)]
-        public string UnitSymbols
-        {
-            get { return units.ToString(); }
-            set { Units=ProjectUnits.Parse(value); }
-        }
-
-        [XmlIgnore(), TypeConverter(typeof(ProjectUnits.UnitsTypeConverter))]
-        public ProjectUnits Units
-        {
-            get { return units; }
-            set
-            {
-                if (units==null)
-                {
-                    // Project Units Set
-                    this.units=value;
-                    OnProjectUnitsSet(new ProjectUnits.SetEventArgs(value));
-                }
-                else
-                {
-                    // Project Units Changed
-                    ProjectUnits old_units=units;
-                    this.units=value;
-                    OnProjectUnitsChange(new ProjectUnits.ChangeEventArgs(old_units, value));
-                }
             }
         }
 
@@ -135,6 +114,7 @@ namespace JA.Engineering
         #endregion
 
         #region Internal Event Handlers
+
         void BindableList_ProjectUnitsChanged(object sender, ProjectUnits.ChangeEventArgs e)
         {
             OnItemChanged(new ItemChangeEventArgs());
@@ -172,27 +152,17 @@ namespace JA.Engineering
             this.ItemChanged?.Invoke(this, e);
         }
 
-        protected void OnProjectUnitsSet(ProjectUnits.SetEventArgs e)
-        {
-            this.ProjectUnitsSet?.Invoke(this, e);
-        }
-        protected void OnProjectUnitsChange(ProjectUnits.ChangeEventArgs e)
-        {
-            this.ProjectUnitsChanged?.Invoke(this, e);
-        }
         #endregion
 
         public class ItemChangeEventArgs : EventArgs
         {
-            readonly int index;
-
             public ItemChangeEventArgs() : this(-1) { }
             public ItemChangeEventArgs(int changed_item_index)
             {
-                this.index=changed_item_index;
+                this.ChangedItemIndex=changed_item_index;
             }
-            public bool AllItems { get { return index==-1; } }
-            public int ChangedItemIndex { get { return index; } }
+            public bool AllItems { get { return ChangedItemIndex==-1; } }
+            public int ChangedItemIndex { get; }
         }
     }
 
