@@ -9,16 +9,18 @@ using System.Diagnostics;
 namespace JA.Engineering
 {
 
-    public interface ISpan : IContainsMeasures
+    public interface ISpan : IContainsMeasures, IEquatable<ISpan>
     {
         Vector2 StartPosition { get; set; }
         Vector2 EndPosition { get; }
         Vector2 Step { get; }
         bool IsOK { get; }
     }
-
+    /// <summary>
+    /// A span defines two points in space
+    /// </summary>
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class Span : ISpan, INotifyPropertyChanged, ICloneable, IFormattable
+    public class Span : ISpan, IEquatable<Span>, INotifyPropertyChanged, ICloneable, IFormattable
     {
         public static readonly string DefaultLengthFormat="0.###";
         public static readonly double DefaultSpanLength=500;
@@ -28,6 +30,9 @@ namespace JA.Engineering
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventArgs<Span>.Handler SpanChanged;
 
+        /// <summary>
+        /// Changes raise events if true
+        /// </summary>
         [XmlIgnore(), Bindable(BindableSupport.No)]
         public bool RaisesChangedEvents { get; set; }
 
@@ -60,16 +65,34 @@ namespace JA.Engineering
 
         #region Properties
 
+        /// <summary>
+        /// Check of the span is well defined
+        /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.Yes)]
         public virtual bool IsOK => step.X.IsFinite()&&step.X.IsPositive();
-        [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
+        /// <summary>
+        /// The span starting position
+        /// </summary>
+        [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]        
         public Vector2 StartPosition { get; set; }
+        /// <summary>
+        /// The span ending postion
+        /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 EndPosition => StartPosition+step;
+        /// <summary>
+        /// The ground at the starting postion (y=0)
+        /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 StartBase => new Vector2(StartPosition.X, 0);
+        /// <summary>
+        /// The ground at the ending position (y=0)
+        /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 EndBase => new Vector2(StartPosition.X+step.X, 0);
+        /// <summary>
+        /// The span
+        /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 Step
         {
@@ -87,6 +110,9 @@ namespace JA.Engineering
                 }
             }
         }
+        /// <summary>
+        /// The x-coordinate of the start point
+        /// </summary>
         [RefreshProperties(RefreshProperties.None), XmlAttribute()]
         public double StartX
         {
@@ -95,6 +121,9 @@ namespace JA.Engineering
                 //start.x=value;
                 StartPosition = new Vector2(value, StartPosition.Y);
         }
+        /// <summary>
+        /// The y-coordinate of the start point
+        /// </summary>
         [RefreshProperties(RefreshProperties.None), XmlAttribute()]
         public double StartY
         {
@@ -103,6 +132,9 @@ namespace JA.Engineering
                 //start.y=value;
                 StartPosition = new Vector2(StartPosition.X, value);
         }
+        /// <summary>
+        /// The horizontal span
+        /// </summary>
         [RefreshProperties(RefreshProperties.All), XmlAttribute()]
         public double SpanX
         {
@@ -125,6 +157,9 @@ namespace JA.Engineering
                 }
             }
         }
+        /// <summary>
+        /// The vertical rize
+        /// </summary>
         [RefreshProperties(RefreshProperties.All), XmlAttribute()]
         public double SpanY
         {
@@ -147,10 +182,19 @@ namespace JA.Engineering
                 }
             }
         }
+        /// <summary>
+        /// The hypotenous of the span
+        /// </summary>
         [ReadOnly(true), RefreshProperties(RefreshProperties.None), XmlIgnore()]
         public double SpanLength => step.Manitude;
+        /// <summary>
+        /// A function of the <c>y=f(x)</c> form for the diagonal
+        /// </summary>
         [XmlIgnore(), Browsable(false), Bindable(BindableSupport.No)]
         public Func<double, double> DiagonalFunction => (x) => StartPosition.Y+x*step.Y/step.X;
+        /// <summary>
+        /// A parametric line of the diagonal in the form of <c>pos=f(t=0..1)</c>
+        /// </summary>
         [XmlIgnore(), Browsable(false), Bindable(BindableSupport.No)]
         public Func<double, Vector2> ParametricDiagonal => (t) => new Vector2(StartPosition.X+step.X*t, StartPosition.Y+step.Y*t);
         #endregion
@@ -225,7 +269,7 @@ namespace JA.Engineering
                 step.ToString(format, provider));
         }
         #endregion
-
+                
         #region INotifyPropertyChanged Members
 
         protected void OnPropertyChanged<T>(System.Linq.Expressions.Expression<Func<T>> property)
@@ -250,12 +294,47 @@ namespace JA.Engineering
             this.StartPosition *= g.LengthFactor;
             this.Step *= g.LengthFactor;
 
+
             this.RaisesChangedEvents = raise;
         }
         void IContainsMeasures.ScaleForUnits(ProjectUnits.ChangeEventArgs g) => ScaleForUnits(g);
 
         #endregion
 
+        #region Equatable
+        public bool Equals(Span other)
+        {
+            return StartPosition.Equals(other.StartPosition)
+                && Step.Equals(other.Step);
+        }
+        public bool Equals(ISpan other)
+        {
+            return StartPosition.Equals(other.StartPosition)
+                && Step.Equals(other.Step);
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj is ISpan span)
+            {
+                return Equals(span);
+            }
+            if (obj is Span span2)
+            {
+                return Equals(span2);
+            }
+            return false;
+        }
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hc = 17*23;
+                hc = 23*hc + StartPosition.GetHashCode();
+                hc = 23*hc + Step.GetHashCode();
+                return hc;
+            }
+        }
+        #endregion
     }
 
     #region Span List
