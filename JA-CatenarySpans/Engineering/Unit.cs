@@ -168,10 +168,10 @@ namespace JA.Engineering
             {
                 return Scale / other.Scale;
             }
-            throw new ArgumentException("Units must be combatible for conversion.");
+            throw new ArgumentException("Units must be compatible for conversion.");
         }
         /// <summary>
-        /// Check for equality between units (when overriden)
+        /// Check for equality between units (when overridden)
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>

@@ -119,7 +119,7 @@ namespace JA.CatenarySpans
                 using (Font font = style.MakeFont(SystemFonts.DialogFont))
                 {
                     g.DrawLine(Pens.Black, A0, B0);
-                    var txt = string.Format("{0:0.#}", catenary.SpanX);
+                    var txt = string.Format("{0:0.#}", catenary.StepX);
                     em=g.MeasureString("M", font);
                     float y = canvas.Target.Top+em.Height;
                     style.HorizontalArrow(g, y, A.X, B.X, txt, true);
@@ -217,7 +217,7 @@ namespace JA.CatenarySpans
             if(catenary.IsOK)
             {
                 Vector2 d=catenary.SagPosition;
-                double t=(d.X-catenary.StartPosition.X)/catenary.SpanX;
+                double t=(d.X-catenary.StartPosition.X)/catenary.StepX;
                 Vector2 h=catenary.StartPosition+t*(catenary.EndPosition-catenary.StartPosition);
                 PointF D=canvas.Map(d);
                 PointF H=canvas.Map(h);

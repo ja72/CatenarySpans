@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using System.Globalization;
 
 namespace JA.Engineering
-{    
-    public sealed class RulingSpan : HasUnitsBase, IContainsMeasures,  IListSource, ICloneable
+{
+    public sealed class RulingSpan : HasUnitsBase, IContainsMeasures, IListSource, ICloneable, IEquatable<RulingSpan>, IFormattable
     {
         public event EventHandler<ItemChangeEventArgs> RulingSpanChanged;
 
         #region Factory
-        public RulingSpan() : this(new ProjectUnits(ProjectUnitSystem.FeetPoundSecond)) { }
+        public RulingSpan() : this(ProjectUnits.Default()) { }
         public RulingSpan(ProjectUnits units) : base(units)
         {
             this.Spans = new BindingList<Catenary>
@@ -24,45 +25,46 @@ namespace JA.Engineering
             };
             //Span Events
             this.Spans.AddingNew+=new AddingNewEventHandler(spans_AddingNew);
-            this.Spans.ListChanged+=new ListChangedEventHandler(spans_ListChanged);            
-            
+            this.Spans.ListChanged+=new ListChangedEventHandler(spans_ListChanged);
+
             //Ruling Span Events
             this.RulingSpanChanged+=new EventHandler<ItemChangeEventArgs>(RulingSpan_RulingSpanChanged);
         }
-        public RulingSpan(RulingSpan other) : this(other.Units.Clone())
+        public RulingSpan(RulingSpan other)
+            : this(other.Units.Clone())
         {
             RaiseListChangedEvents=false;
-            for (int i=0; i<other.Spans.Count; i++)
+            for (int i = 0; i<other.Spans.Count; i++)
             {
                 Spans.Add(other.Spans[i].Clone());
             }
             RaiseListChangedEvents=true;
             OnRulingSpanChange(new ItemChangeEventArgs());
         }
+        public RulingSpan(params Catenary[] list) : this(ProjectUnits.Default(), list) { }
         public RulingSpan(ProjectUnits units, params Catenary[] list) : this(units)
         {
             //Set Units
-            this.AddArray(list);
+            this.AddSpans(list);
         }
-        public RulingSpan(ProjectUnits units, params Span[] list) : this(units)
+        public RulingSpan(Span[] list, double weight, double H) : this(ProjectUnits.Default(), list, weight, H) { }
+        public RulingSpan(ProjectUnits units, Span[] list, double weight, double H) : this(units)
         {
-            AddArray(list);
+            AddSpans(list, weight, H);
         }
-        public void AddArray(params Span[] list)
+        public void AddSpans(Span[] list, double weight, double H)
         {
-            var wt = Catenary.DefaultWeight;
-            var H = Catenary.DefaultHorizontalTension;
             Catenary last = null;
             if (Spans.Count>0)
             {
                 last = Spans.Last();
-                wt = last.Weight;
+                weight = last.CableWeight;
                 H = last.HorizontalTension;
             }
             RaiseListChangedEvents=false;
-            for(int i=0; i<list.Length; i++)
+            for (int i = 0; i<list.Length; i++)
             {
-                var cat = new Catenary(list[i], wt, H);
+                var cat = new Catenary(list[i], weight, H);
                 if (last!=null)
                 {
                     cat.StartPosition = last.EndPosition;
@@ -74,7 +76,7 @@ namespace JA.Engineering
 
             OnRulingSpanChange(new ItemChangeEventArgs());
         }
-        public void AddArray(params Catenary[] list)
+        public void AddSpans(params Catenary[] list)
         {
             RaiseListChangedEvents=false;
             for (int i = 0; i<list.Length; i++)
@@ -85,18 +87,18 @@ namespace JA.Engineering
 
             OnRulingSpanChange(new ItemChangeEventArgs());
         }
-
+        /// <summary>
+        /// Define a new catenary using defaults
+        /// </summary>
+        /// <returns></returns>
         public Catenary NewCatenary()
         {
-            var last=Last;
-            if(last==null)
+            var last = Last;
+            if (last==null)
             {
-                return new Catenary();
+                return Catenary.Default(ProjectUnits.Default());
             }
-            return new Catenary(last.EndPosition, last.SpanX, 0, last.Weight)
-            {
-                HorizontalTension=last.HorizontalTension
-            };
+            return new Catenary(last.EndPosition, last.StepX, 0.0, last.CableWeight, last.HorizontalTension);
         }
         #endregion
 
@@ -104,8 +106,11 @@ namespace JA.Engineering
 
         public Catenary GetRulingSpanCatenary()
         {
-            var rs= new Span(Vector2.Origin, RulingSpanLength ,0);
-            return new Catenary(rs, Spans[0].Weight, Spans[0].HorizontalTension);
+            var rs = new Span(
+                HasSpans ? Spans[0].StartPosition : Span.Default(Units).StartPosition,
+                RulingSpanLength,
+                0);
+            return new Catenary(rs, CableWeight, HorizontalTension);
         }
 
         /// <summary>
@@ -115,52 +120,55 @@ namespace JA.Engineering
         {
             get
             {
-                var rs1=0.0;
-                var rs2=0.0;
-                for (int i=0; i<Spans.Count; i++)
+                var rs1 = 0.0;
+                var rs2 = 0.0;
+                for (int i = 0; i<Spans.Count; i++)
                 {
-                    double δx=Spans[i].SpanX;
-                    double δy=Spans[i].SpanY;
+                    double δx = Spans[i].StepX;
+                    double δy = Spans[i].StepY;
                     rs1+=Math.Pow(δx, 3);
-                    double slope=δy/δx;
+                    double slope = δy/δx;
                     rs2+=δx*Math.Pow(1+slope*slope, 1.5);
                 }
-                return Math.Round( Math.Sqrt(rs1/rs2), 1);
+                return Math.Round(Math.Sqrt(rs1/rs2), 1);
             }
         }
-
-        public void UpdateAllFromFrom(int span_index)
+        /// <summary>
+        /// Update all spans from tension on one span.
+        /// </summary>
+        /// <param name="spanIndex">The span index whose tension to use.</param>
+        public void UpdateAllFromFrom(int spanIndex)
         {
-            if (span_index>=0&&span_index<=Spans.Count)
+            if (spanIndex>=0&&spanIndex<=Spans.Count)
             {
-                HorizontalTension=Spans[span_index].HorizontalTension;
+                HorizontalTension=Spans[spanIndex].HorizontalTension;
             }
         }
 
         public void UpdateAllCatenary()
         {
-            for(int i=0; i<Spans.Count; i++)
+            for (int i = 0; i<Spans.Count; i++)
             {
                 Spans[i].CalculateCenter();
             }
         }
         public void UpdateSpanEnds()
         {
-            for(int i=1; i<Spans.Count; i++)
+            for (int i = 1; i<Spans.Count; i++)
             {
                 Spans[i].StartPosition=this[i-1].EndPosition;
-            }            
+            }
         }
         public void SetCableWeight(double wt)
         {
             for (int i = 0; i<Spans.Count; i++)
             {
-                Spans[i].Weight = wt;
+                Spans[i].CableWeight = wt;
             }
         }
         public void SetHorizontalTension(double H)
         {
-            for(int i=0; i<Spans.Count; i++)
+            for (int i = 0; i<Spans.Count; i++)
             {
                 Spans[i].HorizontalTension=H;
             }
@@ -168,10 +176,10 @@ namespace JA.Engineering
         }
         public void SetHorizontalTensionFrom(int span_index)
         {
-            double H=Spans[span_index].HorizontalTension;
-            for(int i=0; i<Spans.Count; i++)
+            double H = Spans[span_index].HorizontalTension;
+            for (int i = 0; i<Spans.Count; i++)
             {
-                if(i!=span_index)
+                if (i!=span_index)
                 {
                     Spans[i].HorizontalTension=H;
                 }
@@ -180,23 +188,28 @@ namespace JA.Engineering
         }
         public Catenary FindCatenaryFromX(double x)
         {
-            foreach(var item in Spans)
+            foreach (var item in Spans)
             {
-                if(item.ContainsX(x))
+                if (item.ContainsX(x))
                 {
                     return item;
                 }
             }
             return null;
         }
-
+        /// <summary>
+        /// Find vertical separation between catenary and point.
+        /// </summary>
+        /// <param name="point">The target point</param>
+        /// <param name="directional">Return absolute value if false.</param>
+        /// <returns></returns>
         public double ClearanceTo(Vector2 point, bool directional)
         {
-            Catenary catenary=FindCatenaryFromX(point.X);
-            if(catenary!=null)
+            Catenary catenary = FindCatenaryFromX(point.X);
+            if (catenary!=null)
             {
-                double dy=catenary.CatenaryFunction(point.X)-point.Y;
-                return directional?dy:Math.Abs(dy);
+                double dy = catenary.CatenaryFunction(point.X)-point.Y;
+                return directional ? dy : Math.Abs(dy);
             }
             return 0;
         }
@@ -220,10 +233,15 @@ namespace JA.Engineering
         #endregion
 
         #region Properties
+        [XmlIgnore()]
+        public bool IsOk => HasSpans && Spans.All((s) => s.IsOK);
+
         [XmlIgnore(), Bindable(BindableSupport.No)]
-        public bool RaiseListChangedEvents { 
-            get => Spans.RaiseListChangedEvents; 
-            set => Spans.RaiseListChangedEvents = value; }
+        public bool RaiseListChangedEvents
+        {
+            get => Spans.RaiseListChangedEvents;
+            set => Spans.RaiseListChangedEvents = value;
+        }
 
         public Catenary this[int index]
         {
@@ -252,11 +270,11 @@ namespace JA.Engineering
         public BindingList<Catenary> Spans { get; }
 
         [XmlIgnore()]
-        public Catenary First { get { return Spans.Count>0?this[0]:null; } }
+        public Catenary First { get { return Spans.Count>0 ? this[0] : null; } }
         [XmlIgnore()]
-        public Catenary Last { get { return Spans.Count>0?this[Spans.Count-1]:null; } }
+        public Catenary Last { get { return Spans.Count>0 ? this[Spans.Count-1] : null; } }
 
-        [TypeConverter(typeof(System.ComponentModel.DoubleConverter))]        
+        [TypeConverter(typeof(System.ComponentModel.DoubleConverter))]
         [XmlIgnore(), Bindable(BindableSupport.Yes), DisplayName("TotalLength")]
         public string TotalLengthDisplay
         {
@@ -274,32 +292,37 @@ namespace JA.Engineering
             set
             {
                 string[] parts = value.Split(' ');
-                Unit unit=Units.ForceUnit;
-                if(parts.Length>1)
+                Unit unit = Units.ForceUnit;
+                if (parts.Length>1)
                 {
                     unit=parts[1];
                 }
-                if(!Units.ForceUnit.IsCompatible(unit))
+                if (!Units.ForceUnit.IsCompatible(unit))
                 {
                     return;
                 }
-                if(double.TryParse(parts[0], out double x))
+                if (double.TryParse(parts[0], out double x))
                 {
                     HorizontalTension=unit.FactorTo(Units.ForceUnit)*x;
                 }
             }
         }
         [XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
-        public double HorizontalTension
+        public double CableWeight
         {
-            get { return HasSpans?Spans[0].HorizontalTension:0; }
+            get { return HasSpans ? Spans[Spans.Count-1].CableWeight : 0; }
             set
             {
-                if(HasSpans)
-                { 
-                    Spans[0].HorizontalTension=value;
-                    OnRulingSpanChange(new ItemChangeEventArgs(0));
-                }
+                SetCableWeight(value);
+            }
+        }
+        [XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
+        public double HorizontalTension
+        {
+            get { return HasSpans ? Spans[Spans.Count-1].HorizontalTension : 0; }
+            set
+            {
+                SetHorizontalTension(value);
             }
         }
         [XmlIgnore(), Bindable(BindableSupport.No)]
@@ -310,7 +333,7 @@ namespace JA.Engineering
         void RulingSpan_RulingSpanChanged(object sender, ItemChangeEventArgs e)
         {
 
-            if(!e.AllItems)
+            if (!e.AllItems)
             {
                 SetHorizontalTensionFrom(e.ChangedItemIndex);
             }
@@ -323,12 +346,12 @@ namespace JA.Engineering
 
         void spans_ListChanged(object sender, ListChangedEventArgs e)
         {
-            if(e.ListChangedType==ListChangedType.PropertyDescriptorAdded
+            if (e.ListChangedType==ListChangedType.PropertyDescriptorAdded
                 ||e.ListChangedType==ListChangedType.PropertyDescriptorDeleted)
             {
                 return;
             }
-            if(e.ListChangedType==ListChangedType.ItemDeleted
+            if (e.ListChangedType==ListChangedType.ItemDeleted
                 ||e.ListChangedType==ListChangedType.ItemMoved)
             {
                 OnRulingSpanChange(new ItemChangeEventArgs());
@@ -358,24 +381,24 @@ namespace JA.Engineering
         #region File I/O
         public static RulingSpan OpenFile(string path)
         {
-            XmlSerializer xs=new XmlSerializer(typeof(RulingSpan));
-            var fs=System.IO.File.Open(path, System.IO.FileMode.Open, System.IO.FileAccess.Read);
-            var rs=xs.Deserialize(fs) as RulingSpan;
+            XmlSerializer xs = new XmlSerializer(typeof(RulingSpan));
+            var fs = System.IO.File.Open(path, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+            var rs = xs.Deserialize(fs) as RulingSpan;
             fs.Close();
             return rs;
         }
 
         public void SaveFile(string path)
         {
-            XmlSerializer xs=new XmlSerializer(typeof(RulingSpan));
-            var fs=System.IO.File.Open(path, System.IO.FileMode.Create, System.IO.FileAccess.Write);
+            XmlSerializer xs = new XmlSerializer(typeof(RulingSpan));
+            var fs = System.IO.File.Open(path, System.IO.FileMode.Create, System.IO.FileAccess.Write);
             xs.Serialize(fs, this);
             fs.Close();
         }
-        
+
         #endregion
 
-        #region Event Args
+        #region Event Arguments
         public class ItemChangeEventArgs : EventArgs
         {
             readonly int index;
@@ -387,7 +410,7 @@ namespace JA.Engineering
             }
             public bool AllItems { get { return index==-1; } }
             public int ChangedItemIndex { get { return index; } }
-        } 
+        }
         #endregion
 
         #region IListSource Members
@@ -415,6 +438,42 @@ namespace JA.Engineering
 
         #endregion
 
-    }
+        #region Equatable
 
+        public bool Equals(RulingSpan other)
+        {
+            return Units.Equals(other.Units)
+                && Spans.AllEqual(other.Spans);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is RulingSpan rs)
+            {
+                return Equals(rs);
+            }
+            return false;
+        }
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hc = 17;
+                foreach (var item in Spans)
+                {
+                    hc = 23*hc + item.GetHashCode();
+                }
+                return hc;
+            }
+        }
+        #endregion
+
+        #region Formatting
+        public override string ToString() => ToString("0.###", CultureInfo.CurrentCulture.NumberFormat);
+        public string ToString(string formatting, IFormatProvider formatProvider)
+        {
+            return $"RS({string.Join(", ", Spans.Select((s) => s.StepX.ToString(formatting, formatProvider)))}), Weight={CableWeight.ToString(formatting, formatProvider)}, H={HorizontalTension.ToString(formatting, formatProvider)}";
+        }
+        #endregion
+    }
 }

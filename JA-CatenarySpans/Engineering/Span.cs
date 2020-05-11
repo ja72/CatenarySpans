@@ -8,7 +8,9 @@ using System.Diagnostics;
 
 namespace JA.Engineering
 {
-
+    /// <summary>
+    /// Interface definition of span
+    /// </summary>
     public interface ISpan : IContainsMeasures, IEquatable<ISpan>
     {
         Vector2 StartPosition { get; set; }
@@ -23,9 +25,16 @@ namespace JA.Engineering
     public class Span : ISpan, IEquatable<Span>, INotifyPropertyChanged, ICloneable, IFormattable
     {
         public static readonly string DefaultLengthFormat="0.###";
-        public static readonly double DefaultSpanLength=500;
+        public static readonly double DefaultSpanLength=700;
         public static readonly double DefaultTowerHeight=100;
-        public static readonly double DefaultSpanRise=50;
+        public static readonly double DefaultSpanRise=0;
+
+        public static Span Default(ProjectUnits projectUnits)
+        {
+            var f_length = Unit.ft.FactorTo(projectUnits.LengthUnit);
+            return new Span(f_length*Vector2.UnitY*DefaultTowerHeight, f_length*DefaultSpanLength, f_length*DefaultSpanRise);
+        }
+
         Vector2 step;
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventArgs<Span>.Handler SpanChanged;
@@ -76,12 +85,12 @@ namespace JA.Engineering
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]        
         public Vector2 StartPosition { get; set; }
         /// <summary>
-        /// The span ending postion
+        /// The span ending position
         /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 EndPosition => StartPosition+step;
         /// <summary>
-        /// The ground at the starting postion (y=0)
+        /// The ground at the starting position (y=0)
         /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
         public Vector2 StartBase => new Vector2(StartPosition.X, 0);
@@ -135,8 +144,8 @@ namespace JA.Engineering
         /// <summary>
         /// The horizontal span
         /// </summary>
-        [RefreshProperties(RefreshProperties.All), XmlAttribute()]
-        public double SpanX
+        [RefreshProperties(RefreshProperties.All), XmlAttribute("SpanX")]
+        public double StepX
         {
             get => step.X;
             set
@@ -152,16 +161,16 @@ namespace JA.Engineering
                     if (RaisesChangedEvents)
                     {
                         OnSpanChanged(new EventArgs<Span>(this));
-                        OnPropertyChanged(() => SpanX);
+                        OnPropertyChanged(() => StepX);
                     }
                 }
             }
         }
         /// <summary>
-        /// The vertical rize
+        /// The vertical rise
         /// </summary>
-        [RefreshProperties(RefreshProperties.All), XmlAttribute()]
-        public double SpanY
+        [RefreshProperties(RefreshProperties.All), XmlAttribute("SpanY")]
+        public double StepY
         {
             get => step.Y;
             set
@@ -177,16 +186,16 @@ namespace JA.Engineering
                     if (RaisesChangedEvents)
                     {
                         OnSpanChanged(new EventArgs<Span>(this));
-                        OnPropertyChanged(() => SpanY);
+                        OnPropertyChanged(() => StepY);
                     }
                 }
             }
         }
         /// <summary>
-        /// The hypotenous of the span
+        /// The hypotenuse of the span
         /// </summary>
         [ReadOnly(true), RefreshProperties(RefreshProperties.None), XmlIgnore()]
-        public double SpanLength => step.Manitude;
+        public double DiagonalLength => step.Manitude;
         /// <summary>
         /// A function of the <c>y=f(x)</c> form for the diagonal
         /// </summary>
@@ -413,7 +422,7 @@ namespace JA.Engineering
                 return new T()
                 {
                     StartPosition=last.EndPosition,
-                    SpanX=last.SpanX,
+                    StepX=last.StepX,
                 };
             }
         }

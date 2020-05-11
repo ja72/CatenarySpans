@@ -11,7 +11,7 @@ namespace JA
     /// </summary>
     public static class ArrayEx
     {
-        public static Random rnd=new Random();
+        public static Random RandomNumberGenerator { get; } = new Random();
 
         #region Factory
         public static double[] VectorCreate(int rows)
@@ -34,7 +34,7 @@ namespace JA
             double[][] result=new double[rows][];
             for (int i=0; i<rows; ++i)
                 result[i]=new double[cols];
-            // auto init to 0.0  
+            // auto initialize to 0.0  
             return result;
         }
         public static double[][] MatrixCreate(int rows, int cols, Func<int, int, double> init)
@@ -72,7 +72,7 @@ namespace JA
             // return matrix with values between minVal and maxVal
             double[] result=new double[rows];
             for (int i=0; i<rows; ++i)
-                result[i]=(maxVal-minVal)*rnd.NextDouble()+minVal;
+                result[i]=(maxVal-minVal)*RandomNumberGenerator.NextDouble()+minVal;
             return result;
         }
         public static double[][] MatrixRandom(int rows, int cols,
@@ -82,7 +82,7 @@ namespace JA
             double[][] result=MatrixCreate(rows, cols);
             for (int i=0; i<rows; ++i)
                 for (int j=0; j<cols; ++j)
-                    result[i][j]=(maxVal-minVal)*rnd.NextDouble()+minVal;
+                    result[i][j]=(maxVal-minVal)*RandomNumberGenerator.NextDouble()+minVal;
             return result;
         }
         public static double[][] MatrixIdentity(int n)
@@ -533,6 +533,57 @@ namespace JA
 
         #endregion
 
+
+        /// <summary>
+        /// Check of two arrays are equal in value. Calls <see cref="object.Equals(object)"/> or whatever override exists.
+        /// </summary>
+        /// <typeparam name="T">The array element type.</typeparam>
+        /// <param name="array">The first array.</param>
+        /// <param name="other">The second array.</param>
+        public static bool AllEqual<T>(this T[] array, T[] other)
+        {
+            // Convert null arrays into empty arrays.
+            array = array??Array.Empty<T>();
+            other = other??Array.Empty<T>();
+            if (array.Length == other.Length)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (!array[i].Equals(other[i]))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        public static bool AllEqual<T>(this ICollection<T> array, ICollection<T> other)
+        {
+            if (array.Count != other.Count) return false;
+            var l_array = new T[array.Count];
+            var l_other = new T[other.Count];
+            array.CopyTo(l_array, 0);
+            other.CopyTo(l_other, 0);
+            return AllEqual(l_array, l_other);
+        }
+        /// <summary>
+        /// Calculate hash code from a list of items.
+        /// </summary>
+        /// <typeparam name="T">The list element type</typeparam>
+        /// <param name="list">The list</param>
+        public static int CalcHashCode<T>(this IEnumerable<T> list)
+        {
+            unchecked
+            {
+                int hc = 17;
+                foreach (var item in list)
+                {
+                    hc = 23*hc + item.GetHashCode();
+                }
+                return hc;
+            }
+        }
     }
 
 }

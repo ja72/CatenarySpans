@@ -18,9 +18,9 @@ namespace JA.Engineering
     {
 
         #region Factory
-        public Cable(double dia, params (Alloy alloy, double area)[] layers)
+        public Cable(double diameter, params (Alloy alloy, double area)[] layers)
         {
-            this.Diameter=  dia;
+            this.Diameter=  diameter;
             foreach (var (alloy, area) in layers)
             {
                 this.Area += area;
@@ -28,12 +28,12 @@ namespace JA.Engineering
                 this.RatedStrength += area*alloy.YieldStrength;
             }
         }
-        public Cable(double area, double dia, double wt, double rts)
+        public Cable(double area, double diameter, double unitWeight, double ratedStrength)
         {
             this.Area = area;
-            this.Diameter = dia;
-            this.Weight = wt;
-            this.RatedStrength = rts;
+            this.Diameter = diameter;
+            this.Weight = unitWeight;
+            this.RatedStrength = ratedStrength;
         }
 
         public Cable(ICable other)

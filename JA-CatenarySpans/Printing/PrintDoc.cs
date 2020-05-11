@@ -10,7 +10,7 @@ using JA.Gdi;
 namespace JA.Printing
 {
     /// <summary>
-    /// When implemented, 2D objects can draw themselgs on a print output via the <see cref="PrintDoc"/> class.
+    /// When implemented, 2D objects can draw themselves on a print output via the <see cref="PrintDoc"/> class.
     /// </summary>
     public interface IPrintable
     {
@@ -148,11 +148,6 @@ namespace JA.Printing
         {
             items.Add(new Picture(image));
         }
-
-        //public void AddDrawing(Drawing drawing)
-        //{
-        //    m_items.Add(new DrawingPrintout(drawing));
-        //}
 
         public bool PrintInColor
         {

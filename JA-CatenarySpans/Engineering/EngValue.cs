@@ -332,7 +332,7 @@ namespace JA.Engineering
 
         /// <summary>
         /// Check symbol if it might contain an SI prefix like "ms" for millisecond.
-        /// First case-sensitive search is done, and then a case-insesitive search.
+        /// First case-sensitive search is done, and then a case-insensitive search.
         /// </summary>
         /// <param name="symbol">The symbol to check</param>
         /// <param name="exponent">returns the exponent for the found prefix (if applicable)</param>

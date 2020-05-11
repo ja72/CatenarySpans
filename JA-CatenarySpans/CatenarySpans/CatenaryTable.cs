@@ -82,9 +82,9 @@ namespace JA.CatenarySpans
             return new string[] {
                 item.StartX.ToString("0.#"),
                 item.StartY.ToString("0.#"),
-                item.SpanX.ToString("0.#"),
-                item.SpanY.ToString("0.#"),
-                item.Weight.ToString("0.###"),
+                item.StepX.ToString("0.#"),
+                item.StepY.ToString("0.#"),
+                item.CableWeight.ToString("0.###"),
                 item.AverageTension.ToString("0.#"),
                 item.TotalLength.ToString("0.#"),
                 item.MaximumSag.ToString("0.##"),

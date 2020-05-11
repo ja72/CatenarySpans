@@ -193,7 +193,7 @@ namespace JA.Gdi
     public struct ColorHSL
     {
         /// <summary>
-        /// Hue, Saturation, Lighness, Alpha
+        /// Hue, Saturation, Lightness, Alpha
         /// </summary>
         public double H, S, L, A;
 

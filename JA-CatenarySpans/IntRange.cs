@@ -13,11 +13,7 @@ namespace JA
             this.Count=count;
             this.Stride=stride;
         }
-#pragma warning disable S2386 // Mutable fields should not be "public static"
-#pragma warning disable S3887 // Mutable, non-private fields should not be "readonly"
         public static readonly IntRange Empty=new IntRange();
-#pragma warning restore S3887 // Mutable, non-private fields should not be "readonly"
-#pragma warning restore S2386 // Mutable fields should not be "public static"
 
         public bool IsEmpty { get { return Count==0; } }
         public int Start { get; }

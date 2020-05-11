@@ -145,7 +145,7 @@ namespace JA.Engineering
             return new Vector2(x, center.Y+a*(Math.Cosh((x-center.X)/a)-1));
         }
         /// <summary>
-        /// Calculate the position on the curve based on paramter <c>t</c> ranging from 0 to 1.
+        /// Calculate the position on the curve based on parameter <c>t</c> ranging from 0 to 1.
         /// </summary>
         /// <param name="span">The span</param>
         /// <param name="center"></param>
@@ -199,7 +199,7 @@ namespace JA.Engineering
             return H*Math.Cosh(w*(x-center.X)/H);
         }
         /// <summary>
-        /// Calculate the avarage tension along the curve, averaged across the length of the curve.
+        /// Calculate the average tension along the curve, averaged across the length of the curve.
         /// </summary>
         /// <param name="span">The span</param>
         /// <param name="center">The center of the catenary</param>
@@ -213,7 +213,7 @@ namespace JA.Engineering
             return H*(η+0.25*(Math.Sinh(4*η*(1-ξ))+Math.Sinh(4*η*ξ)))/(Math.Sinh(2*η*(1-ξ))+Math.Sinh(2*η*ξ));
         }
         /// <summary>
-        /// Calculate the avarage tension along the curve, averaged across the length of the curve.
+        /// Calculate the average tension along the curve, averaged across the length of the curve.
         /// <remarks>The lowest point on the catenary is calculated first.</remarks>
         /// </summary>
         /// <param name="span">The span</param>
@@ -227,7 +227,7 @@ namespace JA.Engineering
         
         #endregion        /// <summary>
 
-        #region Catenrary Solvers
+        #region Catenary Solvers
 
         public const double MinTension=1;
         public const double MinSag=1e-2;

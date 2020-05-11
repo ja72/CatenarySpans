@@ -28,8 +28,8 @@ namespace JA.Engineering
     public class ProjectUnits : IEquatable<ProjectUnits>, ICloneable
     {
 
-        public static readonly ProjectUnitSystem DefaultUnitSystem = ProjectUnitSystem.FeetPoundSecond;
-        public static readonly ProjectUnits Default = new ProjectUnits();
+        public static ProjectUnits Default() => new ProjectUnits(ProjectUnitSystem.FeetPoundSecond);
+        public static ProjectUnits Standard(ProjectUnitSystem unitSystem) => new ProjectUnits(unitSystem);
 
         string time_sym, length_sym, mass_sym, force_sym;
         Unit time_unit, length_unit, mass_unit, force_unit;
@@ -43,7 +43,7 @@ namespace JA.Engineering
         public bool RaiseChangeEvents { get; set; }
 
         #region Factory
-        public ProjectUnits() : this(DefaultUnitSystem) { }
+        //public ProjectUnits() : this(DefaultUnitSystem) { }
         public ProjectUnits(ProjectUnitSystem system)
         {
             switch (system)
@@ -119,6 +119,12 @@ namespace JA.Engineering
             this.length_unit=other.length_unit;
             this.mass_unit=other.mass_unit;
             this.force_unit=other.force_unit;
+
+            this.time_sym = other.time_sym;
+            this.length_sym = other.length_sym;
+            this.mass_sym = other.mass_sym;
+            this.force_sym = other.force_sym;
+
             this.RaiseChangeEvents=true;
         }
         public bool IsOk
@@ -403,7 +409,10 @@ namespace JA.Engineering
 
         #region ICloneable Members
 
-        public ProjectUnits Clone() { return new ProjectUnits(this); }
+        public ProjectUnits Clone() 
+        { 
+            return new ProjectUnits(this); 
+        }
 
         object ICloneable.Clone()
         {

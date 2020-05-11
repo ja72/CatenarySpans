@@ -91,86 +91,80 @@ namespace JA.Engineering.Tests
         [TestMethod()]
         public void CatenaryTest()
         {
-            Assert.Fail();
+            Span s = new Span(new Vector2(15, 100), 300, 50);
+            var c = new Catenary(s, 1.15, 770);
+            Assert.IsTrue(c.IsOK);
+            Assert.IsTrue(s.Equals(c));
+            Assert.AreEqual(1.15, c.CableWeight);
+            Assert.AreEqual(770, c.HorizontalTension);
+
+            Assert.AreEqual(669.5652, c.CatenaryConstant, 1e-4);
+            CollectionAssert.AreEqual(new Vector2(54.832, 98.815), c.SagPoint, Ex.AbsComparer(1e-3));
+            Assert.AreEqual(98.8149, c.Clearance, 1e-4);
+            CollectionAssert.AreEqual(new Vector2(-770, 45.833), c.StartTension, Ex.AbsComparer(1e-3));
+            CollectionAssert.AreEqual(new Vector2(770, 306.78), c.EndTension, Ex.AbsComparer(1e-3));
+            Assert.AreEqual(0.2240, c.Eta, 1e-4);
+            Assert.AreEqual(0.8160, c.GeometricStrainPct, 1e-4);
+            Assert.IsFalse(c.IsStartTowerUplift);
+            Assert.IsFalse(c.IsEndTowerUplift);
+            CollectionAssert.AreEqual(new Vector2(54.832, 98.815), c.LowestPosition, Ex.AbsComparer(1e-3));
+            Assert.AreEqual(17.1019, c.MaximumSag, 1e-4);
+            Assert.AreEqual(17.1012, c.MidSag, 1e-4);
+            Assert.AreEqual(306.6199, c.TotalLength, 1e-4);
+            Assert.AreEqual(352.6128, c.TotalWeight, 1e-4);
+
         }
 
         [TestMethod()]
         public void CatenaryTest1()
         {
-            Assert.Fail();
+            Span s = new Span(new Vector2(15, 100), 300, 50);
+            var c = new Catenary(new Vector2(15, 100),300, 50, 1.15, 770);
+            Assert.IsTrue(c.IsOK);
+            Assert.IsTrue(s.Equals(c));
+            Assert.AreEqual(1.15, c.CableWeight);
+            Assert.AreEqual(770, c.HorizontalTension);
         }
 
         [TestMethod()]
         public void CatenaryTest2()
         {
-            Assert.Fail();
+            Span s = new Span(new Vector2(15, 100), 300, 50);
+            var c = new Catenary(new Vector2(15, 100), new Vector2(300, 50), 1.15, 770);
+            Assert.IsTrue(c.IsOK);
+            Assert.IsTrue(s.Equals(c));
+            Assert.AreEqual(1.15, c.CableWeight);
+            Assert.AreEqual(770, c.HorizontalTension);
         }
 
         [TestMethod()]
         public void CatenaryTest3()
         {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void CatenaryTest4()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void CatenaryTest5()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void CatenaryTest6()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void CalculateCenterTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void GetBoundsTest()
-        {
-            Assert.Fail();
+            var c = new Catenary(new Vector2(15, 100), 300, 50, 1.15, 770);
+            var g = new Catenary(c);
+            Assert.IsTrue(g.Equals(c));            
         }
 
         [TestMethod()]
         public void SetClearancePointTest()
         {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void CloneTest()
-        {
-            Assert.Fail();
+            var c = new Catenary(new Vector2(15, 100), 300, 50, 1.15, 770);
+            var point = new Vector2(50.0, 95.0);
+            c.SetClearancePoint(point);
+            var x = point.X;
+            var actual = new Vector2(x, c.CatenaryFunction(x));
+            CollectionAssert.AreEqual(point, actual, Ex.AbsComparer(1e-3));
         }
 
         [TestMethod()]
         public void ToStringTest()
         {
-            Assert.Fail();
+            var c = new Catenary(new Vector2(15.55555555, 100), 300, 50, 1.155555555, 770.050610824);
+            var t = c.ToString();
+            var e = "Start=(15.556,100), Step=(300,50), H=770.051, w=1.156";
+            Assert.AreEqual(e, t);            
         }
 
-        [TestMethod()]
-        public void ToStringTest1()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void ToStringTest2()
-        {
-            Assert.Fail();
-        }
     }
 }
 

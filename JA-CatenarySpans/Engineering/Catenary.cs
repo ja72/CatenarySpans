@@ -10,54 +10,55 @@ using System.Xml.Serialization;
 namespace JA.Engineering
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class Catenary : Span, ICloneable, IFormattable
+    public class Catenary : Span, IEquatable<Catenary>, ICloneable, IFormattable
     {
         public static readonly string DefaultForceFormat="0.###";
         public static readonly double DefaultHorizontalTension=1000;
         public static readonly double DefaultWeight=1;
-        
+
+        public new static Catenary Default(ProjectUnits projectUnits)
+        {
+            var f_length = Unit.ft.FactorTo(projectUnits.LengthUnit);
+            var f_force = Unit.lbf.FactorTo(projectUnits.ForceUnit);
+            return new Catenary(Span.Default(projectUnits), (f_force/f_length)*DefaultWeight, f_force*DefaultHorizontalTension);
+        }
+
         public event EventArgs<Catenary>.Handler CatenaryChanged;
 
         double weight, horizontalTension;
 
         #region Factory
-        public Catenary()
-            : base()
-        {
-            this.weight=DefaultWeight;
-            this.horizontalTension=DefaultHorizontalTension;
-            this.Center=CatenaryCalculator.CenterPosition(Step, weight, horizontalTension);
-            this.SpanChanged+=new EventArgs<Span>.Handler(Catenary_SpanChanged);
-            this.CatenaryChanged+=new EventArgs<Catenary>.Handler(Catenary_CatenaryChanged);
-        }
-
-        public Catenary(Vector2 origin, double dx, double dy, double weight)
-            : this(origin, new Vector2(dx, dy), weight)
+        /// <summary>
+        /// Create a catenary using the default values defined in <see cref="Catenary"/>.
+        /// </summary>
+        public Catenary() : this(Default(ProjectUnits.Default()))
         { }
-        public Catenary(Vector2 origin, Vector2 span, double weight)
+        public Catenary(Vector2 origin, double dx, double dy, double weight, double H)
+            : this(origin, new Vector2(dx,dy), weight, H)
+        {
+        }
+        public Catenary(Vector2 origin, Vector2 span, double weight, double H)
             : base(origin, span)
         {
             this.weight=weight;
-            this.horizontalTension=DefaultHorizontalTension;
-            this.Center=CatenaryCalculator.CenterPosition(Step, this.weight, horizontalTension);
+            this.horizontalTension=H;
+            this.RelativeCenter=CatenaryCalculator.CenterPosition(Step, this.weight, horizontalTension);
             this.SpanChanged+=new EventArgs<Span>.Handler(Catenary_SpanChanged);
             this.CatenaryChanged+=new EventArgs<Catenary>.Handler(Catenary_CatenaryChanged);
         }
-        public Catenary(ISpan span) : this(span, DefaultWeight) { }
-        public Catenary(ISpan span, double weight) : this(span, weight, DefaultHorizontalTension) { }
         public Catenary(ISpan span, double weight, double H)
             : base(span)
         {
             this.weight=weight;
             this.horizontalTension=H;
-            this.Center=CatenaryCalculator.CenterPosition(Step, this.weight, H);
+            this.RelativeCenter=CatenaryCalculator.CenterPosition(Step, this.weight, H);
             this.SpanChanged+=new EventArgs<Span>.Handler(Catenary_SpanChanged);
             this.CatenaryChanged+=new EventArgs<Catenary>.Handler(Catenary_CatenaryChanged);
         }
         public Catenary(Catenary other)
             : base(other)
         {
-            this.Center=other.Center;
+            this.RelativeCenter=other.RelativeCenter;
             this.weight=other.weight;
             this.horizontalTension=other.horizontalTension;
             this.SpanChanged+=new EventArgs<Span>.Handler(Catenary_SpanChanged);
@@ -66,16 +67,21 @@ namespace JA.Engineering
         #endregion
 
         #region Properties
+        /// <summary>
+        /// True if weight and tension are defined for a valid span.
+        /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.Yes)]
         public override bool IsOK
         {
-            get { return base.IsOK&&horizontalTension.IsPositive(); }
+            get { return base.IsOK && horizontalTension>0 && weight>0; }
         }
-        [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No)]
-        public Vector2 LowestPosition { get { return StartPosition+Center; } }
+
+        /// <summary>
+        /// Cable weight per unit length [Force/Length]
+        /// </summary>
         [RefreshProperties(RefreshProperties.All), XmlAttribute()]
         [TypeConverter(typeof(NiceTypeConverter))]
-        public double Weight
+        public double CableWeight
         {
             get { return weight; }
             set
@@ -90,46 +96,70 @@ namespace JA.Engineering
                     if (RaisesChangedEvents)
                     {
                         OnCatenaryChanged(new EventArgs<Catenary>(this));
-                        OnPropertyChanged(() => Weight);
+                        OnPropertyChanged(() => CableWeight);
                     }
                 }
             }
         }
-
+        /// <summary>
+        /// Lowest point [Length]
+        /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No)]
-        protected Vector2 Center { get; private set; }
-
+        public Vector2 LowestPosition { get { return StartPosition+RelativeCenter; } }
+        /// <summary>
+        /// Sag point location relative to start point [Length]
+        /// </summary>
+        [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No)]
+        protected internal Vector2 RelativeCenter { get; private set; }
+        /// <summary>
+        /// Sag point location [Length]
+        /// </summary>
+        [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No)]
+        public Vector2 SagPoint => StartPosition + RelativeCenter;
+        /// <summary>
+        /// Location of the sag point [Length]
+        /// </summary>
         [ReadOnly(true), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
-        public double CenterX { get { return StartPosition.X+Center.X; } }
+        public double CenterX { get { return StartPosition.X+RelativeCenter.X; } }
+
+        /// <summary>
+        /// Height of sag point [Length]
+        /// </summary>
         [ReadOnly(true), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double CenterY
         {
-            get { return StartPosition.Y+Center.Y; }
+            get { return StartPosition.Y+RelativeCenter.Y; }
         }
+        /// <summary>
+        /// Clearance is distance from ground to sag point [Length]        
+        /// </summary>
+        /// <remarks>If sag point is outside the span, then clearance is to the lowest support point.</remarks>
         [RefreshProperties(RefreshProperties.All), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double Clearance
         {
-            get { return IsCenterInSpan?StartPosition.Y+Center.Y:Math.Min(StartPosition.Y, EndPosition.Y); }
+            get { return IsCenterInSpan?StartPosition.Y+RelativeCenter.Y:Math.Min(StartPosition.Y, EndPosition.Y); }
             set
             {
                 if (value.IsNotFinite()||IsUpliftCondition)
                 {
-                    throw new ArgumentException("Clerance must be finite and lowest point must be in span.");
+                    throw new ArgumentException("Clearance must be finite and lowest point must be in span.");
                 }
                 HorizontalTension=CatenaryCalculator.SetClearance(Step, weight, StartPosition.Y-value, 1e-3);
             }
         }
-
+        /// <summary>
+        /// Maximum sag (deviation from diagonal) [Length]
+        /// </summary>
         [RefreshProperties(RefreshProperties.All), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double MaximumSag
         {
             get
             {
-                return CatenaryCalculator.MaximumSag(Step, Center, weight, horizontalTension);
+                return CatenaryCalculator.MaximumSag(Step, RelativeCenter, weight, horizontalTension);
             }
             set
             {
@@ -140,24 +170,33 @@ namespace JA.Engineering
                 HorizontalTension=CatenaryCalculator.SetMaximumSag(Step, weight, value, 1e-3);
             }
         }
+        /// <summary>
+        /// Sag in the middle of the span [Length]
+        /// </summary>
         [ReadOnly(true), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double MidSag
         {
             get
             {
-                return CatenaryCalculator.MidSag(Step, Center, weight, horizontalTension);
+                return CatenaryCalculator.MidSag(Step, RelativeCenter, weight, horizontalTension);
             }
         }
+        /// <summary>
+        /// The location of maximum sag [Length]
+        /// </summary>
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No)]
         public Vector2 SagPosition
         {
             get
             {
-                double x=CatenaryCalculator.MaximumSagX(Step, Center, weight, horizontalTension);
-                return StartPosition+CatenaryCalculator.PositionAtX(Step, Center, weight, horizontalTension, x);
+                double x=CatenaryCalculator.MaximumSagX(Step, RelativeCenter, weight, horizontalTension);
+                return StartPosition+CatenaryCalculator.PositionAtX(Step, RelativeCenter, weight, horizontalTension, x);
             }
         }
+        /// <summary>
+        /// The catenary constant <c>a = H/w</c> [Length]
+        /// </summary>
         [RefreshProperties(RefreshProperties.All), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double CatenaryConstant
@@ -172,11 +211,14 @@ namespace JA.Engineering
                 HorizontalTension=weight*value;
             }
         }
+        /// <summary>
+        /// Tension parameter <c>η = w*S/(2*H)</c> [Dimensionless]
+        /// </summary>
         [RefreshProperties(RefreshProperties.All), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double Eta
         {
-            get { return weight*SpanX/(2*horizontalTension); }
+            get { return weight*StepX/(2*horizontalTension); }
             set
             {
                 if (value.IsNotFinite()||value.IsNegativeOrZero())
@@ -186,6 +228,9 @@ namespace JA.Engineering
                 HorizontalTension=weight*Step.X/(2*value);
             }
         }
+        /// <summary>
+        /// The minimum tension in the cable [Force]
+        /// </summary>
         [RefreshProperties(RefreshProperties.All), XmlAttribute()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double HorizontalTension
@@ -208,13 +253,16 @@ namespace JA.Engineering
                 }
             }
         }
+        /// <summary>
+        /// The total length of the cable [Length]
+        /// </summary>
         [RefreshProperties(RefreshProperties.All), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double TotalLength
         {
             get
             {
-                return CatenaryCalculator.TotalLength(Step, Center, weight, horizontalTension);
+                return CatenaryCalculator.TotalLength(Step, RelativeCenter, weight, horizontalTension);
             }
             set
             {
@@ -225,6 +273,13 @@ namespace JA.Engineering
                 HorizontalTension=CatenaryCalculator.SetTotalLength(Step, weight, value, 1e-3);
             }
         }
+        
+        /// <summary>
+        /// The total gravitation weight of the cable [Force]
+        /// </summary>
+        [RefreshProperties(RefreshProperties.All), XmlIgnore()]
+        [TypeConverter(typeof(NiceTypeConverter))]
+        public double TotalWeight => CableWeight * TotalLength;
 
         [RefreshProperties(RefreshProperties.All), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
@@ -237,7 +292,7 @@ namespace JA.Engineering
                 {
                     throw new ArgumentException("Geometric strain must be finite and positive.");
                 }
-                TotalLength=SpanX*(1+value/100);
+                TotalLength=StepX*(1+value/100);
             }
         }
         [RefreshProperties(RefreshProperties.All), XmlIgnore()]
@@ -246,7 +301,7 @@ namespace JA.Engineering
         {
             get
             {
-                return CatenaryCalculator.AverageTension(Step, Center, weight, horizontalTension);
+                return CatenaryCalculator.AverageTension(Step, RelativeCenter, weight, horizontalTension);
             }
             set
             {
@@ -262,7 +317,7 @@ namespace JA.Engineering
         {
             get
             {
-                return new Vector2(-horizontalTension, -CatenaryCalculator.VertricalTensionAtX(Step, Center, weight, horizontalTension, 0));
+                return new Vector2(-horizontalTension, -CatenaryCalculator.VertricalTensionAtX(Step, RelativeCenter, weight, horizontalTension, 0));
             }
         }
         [ReadOnly(true), XmlIgnore(), Bindable(BindableSupport.No), Browsable(false)]
@@ -270,7 +325,7 @@ namespace JA.Engineering
         {
             get
             {
-                return new Vector2(horizontalTension, CatenaryCalculator.VertricalTensionAtX(Step, Center, weight, horizontalTension, SpanX));
+                return new Vector2(horizontalTension, CatenaryCalculator.VertricalTensionAtX(Step, RelativeCenter, weight, horizontalTension, StepX));
             }
         }
         /// <summary>
@@ -281,34 +336,34 @@ namespace JA.Engineering
         {
             get
             {
-                return Center.X<=SpanX/2?
-                    CatenaryCalculator.TotalTensionAtX(Step, Center, weight, horizontalTension, 0):
-                    CatenaryCalculator.TotalTensionAtX(Step, Center, weight, horizontalTension, SpanX);
+                return RelativeCenter.X<=StepX/2?
+                    CatenaryCalculator.TotalTensionAtX(Step, RelativeCenter, weight, horizontalTension, 0):
+                    CatenaryCalculator.TotalTensionAtX(Step, RelativeCenter, weight, horizontalTension, StepX);
             }
         }
         [ReadOnly(true), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double StartVerticalTension
         {
-            get { return -CatenaryCalculator.VertricalTensionAtX(Step, Center, weight, horizontalTension, 0); }
+            get { return -CatenaryCalculator.VertricalTensionAtX(Step, RelativeCenter, weight, horizontalTension, 0); }
         }
         [ReadOnly(true), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double EndVerticalTension
         {
-            get { return CatenaryCalculator.VertricalTensionAtX(Step, Center, weight, horizontalTension, SpanX); }
+            get { return CatenaryCalculator.VertricalTensionAtX(Step, RelativeCenter, weight, horizontalTension, StepX); }
         }
         [ReadOnly(true), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double StartTotalTension
         {
-            get { return CatenaryCalculator.TotalTensionAtX(Step, Center, weight, horizontalTension, 0); }
+            get { return CatenaryCalculator.TotalTensionAtX(Step, RelativeCenter, weight, horizontalTension, 0); }
         }
         [ReadOnly(true), XmlIgnore()]
         [TypeConverter(typeof(NiceTypeConverter))]
         public double EndTotalTension
         {
-            get { return CatenaryCalculator.TotalTensionAtX(Step, Center, weight, horizontalTension, SpanX); }
+            get { return CatenaryCalculator.TotalTensionAtX(Step, RelativeCenter, weight, horizontalTension, StepX); }
         }
 
         [ReadOnly(true), XmlIgnore()]
@@ -316,8 +371,8 @@ namespace JA.Engineering
         {
             get
             {
-                double L=CatenaryCalculator.LengthSegmentAtX(Step, Center, weight, horizontalTension, Center.X);
-                return L>=0&&L<=CatenaryCalculator.TotalLength(Step, Center, weight, horizontalTension);
+                double L=CatenaryCalculator.LengthSegmentAtX(Step, RelativeCenter, weight, horizontalTension, RelativeCenter.X);
+                return L>=0&&L<=CatenaryCalculator.TotalLength(Step, RelativeCenter, weight, horizontalTension);
             }
         }
         /// <summary>
@@ -344,9 +399,9 @@ namespace JA.Engineering
         /// <summary>
         /// Helper function that calculates the catenary lowest point and triggers property changed notifiers
         /// </summary>
-        public void CalculateCenter()
+        protected internal void CalculateCenter()
         {
-            this.Center=CatenaryCalculator.CenterPosition(Step, weight, horizontalTension);
+            this.RelativeCenter=CatenaryCalculator.CenterPosition(Step, weight, horizontalTension);
             OnPropertyChanged(() => CenterX);
             OnPropertyChanged(() => CenterY);
         }
@@ -370,8 +425,8 @@ namespace JA.Engineering
             var raise = RaisesChangedEvents;
             this.RaisesChangedEvents = raiseEvents;
             this.HorizontalTension *= g.ForceFactor;
-            this.Weight *= g.ForceFactor/g.LengthFactor;
-            this.Center *= g.LengthFactor;
+            this.CableWeight *= g.ForceFactor/g.LengthFactor;
+            this.RelativeCenter *= g.LengthFactor;
             this.RaisesChangedEvents = raise;
         }
 
@@ -403,12 +458,18 @@ namespace JA.Engineering
 
             }
         }
-
+        /// <summary>
+        /// Find the tension needed for the catenary to pass through a specific point in space.
+        /// </summary>
+        /// <param name="point"></param>
         public void SetClearancePoint(Vector2 point)
         {
-            double x=point.X-StartPosition.X;
-            double D=StartPosition.Y+SpanY/SpanX*x-point.Y;
-            HorizontalTension=CatenaryCalculator.SetSagAtX(Step, weight, D, x, 1e-3);
+            if (ContainsX(point.X))
+            {
+                double x = point.X-StartPosition.X;
+                double D = StartPosition.Y+StepY/StepX*x-point.Y;
+                HorizontalTension=CatenaryCalculator.SetSagAtX(Step, weight, D, x, 1e-3);
+            }
         }
 
         #endregion
@@ -419,7 +480,7 @@ namespace JA.Engineering
         {
             get
             {
-                return (t) => StartPosition+CatenaryCalculator.PositionAtT(Step, Center, weight, horizontalTension, t);
+                return (t) => StartPosition+CatenaryCalculator.PositionAtT(Step, RelativeCenter, weight, horizontalTension, t);
             }
         }
         [XmlIgnore(), Browsable(false), Bindable(BindableSupport.No)]
@@ -427,7 +488,7 @@ namespace JA.Engineering
         {
             get
             {
-                return (t) => new Vector2(horizontalTension, CatenaryCalculator.VertricalTensionAtX(Step, Center, weight, horizontalTension, CatenaryCalculator.ParameterToX(Step, Center, weight, horizontalTension, t)));
+                return (t) => new Vector2(horizontalTension, CatenaryCalculator.VertricalTensionAtX(Step, RelativeCenter, weight, horizontalTension, CatenaryCalculator.ParameterToX(Step, RelativeCenter, weight, horizontalTension, t)));
             }
         }
         [XmlIgnore(), Browsable(false), Bindable(BindableSupport.No)]
@@ -435,7 +496,7 @@ namespace JA.Engineering
         {
             get
             {
-                return (x) => StartPosition.Y+CatenaryCalculator.PositionAtX(Step, Center, weight, horizontalTension, x-StartPosition.X).Y;
+                return (x) => StartPosition.Y+CatenaryCalculator.PositionAtX(Step, RelativeCenter, weight, horizontalTension, x-StartPosition.X).Y;
             }
         }
 
@@ -465,7 +526,38 @@ namespace JA.Engineering
         {
             return string.Format(provider, "{0}, H={1:"+format+"}, w={2:"+format+"}",
                 base.ToString(), horizontalTension, weight);
-        } 
+        }
+        #endregion
+
+        #region Equating
+        public bool Equals(Catenary other)
+        {
+            return base.Equals(other)
+                && HorizontalTension == other.horizontalTension
+                && CableWeight == other.CableWeight;
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj is Catenary other)
+            {
+                return Equals(other);
+            }
+            if (obj is ISpan span)
+            {
+                return Equals(span);
+            }
+            return false;
+        }
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hc = 23*17 + base.GetHashCode();
+                hc = 23*hc + HorizontalTension.GetHashCode();
+                hc = 23*hc + CableWeight.GetHashCode();
+                return hc;
+            }
+        }
         #endregion
     }
 

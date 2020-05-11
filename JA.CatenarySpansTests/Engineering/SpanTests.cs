@@ -17,16 +17,16 @@ namespace JA.Engineering.Tests
         {
             Span s = new Span(new Vector2(15,100), 300, 50);
             Assert.IsTrue(s.IsOK);
-            Assert.AreEqual(new Vector2(15, 100), s.StartPosition);
+            CollectionAssert.AreEqual(new Vector2(15, 100), s.StartPosition);
             Assert.AreEqual(15, s.StartX);
             Assert.AreEqual(100, s.StartY);
-            Assert.AreEqual(new Vector2(300, 50), s.Step);
-            Assert.AreEqual(300, s.SpanX);
-            Assert.AreEqual(50, s.SpanY);
-            Assert.AreEqual(Sqrt(300*300+50*50), s.SpanLength);
-            Assert.AreEqual(new Vector2(315, 150), s.EndPosition);
-            Assert.AreEqual(new Vector2(15, 0), s.StartBase);
-            Assert.AreEqual(new Vector2(315, 0), s.EndBase);            
+            CollectionAssert.AreEqual(new Vector2(300, 50), s.Step);
+            Assert.AreEqual(300, s.StepX);
+            Assert.AreEqual(50, s.StepY);
+            Assert.AreEqual(Sqrt(300*300+50*50), s.DiagonalLength);
+            CollectionAssert.AreEqual(new Vector2(315, 150), s.EndPosition);
+            CollectionAssert.AreEqual(new Vector2(15, 0), s.StartBase);
+            CollectionAssert.AreEqual(new Vector2(315, 0), s.EndBase);            
         }
 
         [TestMethod()]
@@ -40,9 +40,9 @@ namespace JA.Engineering.Tests
             Assert.AreEqual(15, s.StartX);
             Assert.AreEqual(100, s.StartY);
             Assert.AreEqual(new Vector2(300, 50), s.Step);
-            Assert.AreEqual(300, s.SpanX);
-            Assert.AreEqual(50, s.SpanY);
-            Assert.AreEqual(Sqrt(300*300+50*50), s.SpanLength);
+            Assert.AreEqual(300, s.StepX);
+            Assert.AreEqual(50, s.StepY);
+            Assert.AreEqual(Sqrt(300*300+50*50), s.DiagonalLength);
             Assert.AreEqual(new Vector2(315, 150), s.EndPosition);
             Assert.AreEqual(new Vector2(15, 0), s.StartBase);
             Assert.AreEqual(new Vector2(315, 0), s.EndBase);
@@ -57,9 +57,9 @@ namespace JA.Engineering.Tests
             Assert.AreEqual(15, s.StartX);
             Assert.AreEqual(100, s.StartY);
             Assert.AreEqual(new Vector2(300, 50), s.Step);
-            Assert.AreEqual(300, s.SpanX);
-            Assert.AreEqual(50, s.SpanY);
-            Assert.AreEqual(Sqrt(300*300+50*50), s.SpanLength);
+            Assert.AreEqual(300, s.StepX);
+            Assert.AreEqual(50, s.StepY);
+            Assert.AreEqual(Sqrt(300*300+50*50), s.DiagonalLength);
             Assert.AreEqual(new Vector2(315, 150), s.EndPosition);
             Assert.AreEqual(new Vector2(15, 0), s.StartBase);
             Assert.AreEqual(new Vector2(315, 0), s.EndBase);
@@ -84,8 +84,8 @@ namespace JA.Engineering.Tests
             Assert.IsTrue(s.IsOK);
             Assert.AreEqual(0, s.StartX);
             Assert.AreEqual(Span.DefaultTowerHeight, s.StartY);
-            Assert.AreEqual(Span.DefaultSpanLength, s.SpanX);
-            Assert.AreEqual(Span.DefaultSpanRise, s.SpanY);
+            Assert.AreEqual(Span.DefaultSpanLength, s.StepX);
+            Assert.AreEqual(Span.DefaultSpanRise, s.StepY);
         }
 
         [TestMethod()]

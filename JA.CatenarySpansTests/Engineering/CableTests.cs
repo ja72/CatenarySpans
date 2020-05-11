@@ -16,7 +16,7 @@ namespace JA.Engineering.Tests
         [TestMethod()]
         public void CableTest()
         {
-            Cable cable = new Cable(1.0, 0.75, 1.25, 18000);
+            Cable cable = new Cable(area:0.75, diameter:1.0, unitWeight:1.25, ratedStrength:18000);
             Assert.AreEqual(1.0, cable.Diameter);
             Assert.AreEqual(0.75, cable.Area);
             Assert.AreEqual(1.25, cable.Weight);
@@ -26,7 +26,7 @@ namespace JA.Engineering.Tests
         [TestMethod()]
         public void CableTest1()
         {
-            ICable other = new Cable(1.0, 0.75, 1.25, 18000);
+            ICable other = new Cable(area: 0.75, diameter: 1.0, unitWeight: 1.25, ratedStrength: 18000);
             Cable cable = new Cable(other);
             Assert.AreEqual(1.0, cable.Diameter);
             Assert.AreEqual(0.75, cable.Area);
@@ -37,7 +37,7 @@ namespace JA.Engineering.Tests
         [TestMethod()]
         public void CableTest2()
         {
-            Cable other = new Cable(1.0, 0.75, 1.25, 18000);
+            Cable other = new Cable(area: 0.75, diameter: 1.0, unitWeight: 1.25, ratedStrength: 18000);
             Cable cable = new Cable(other);
             Assert.AreEqual(1.0, cable.Diameter);
             Assert.AreEqual(0.75, cable.Area);
@@ -61,7 +61,7 @@ namespace JA.Engineering.Tests
         [TestMethod()]
         public void Cable_CloneAndEqualsTest()
         {
-            var c1 = new Cable(1.0, 0.75, 1.25, 18000);
+            var c1 = new Cable(0.75, 1.0, 1.25, 18000);
             var c2 = c1.Clone();
 
             Assert.AreEqual(c1, c2);

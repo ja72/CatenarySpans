@@ -61,10 +61,10 @@ namespace JA.CatenarySpans
 
             if (rs.Spans.Count==0)
             {
-                Catenary A=new Catenary(150*Vector2.UnitY, 400, 12, 0.75) { HorizontalTension=3000 };
-                Catenary B=new Catenary(A.EndPosition, 1400, -10, 0.75) { HorizontalTension=3000 };
-                Catenary C=new Catenary(B.EndPosition, 700, -20, 0.75) { HorizontalTension=3000 };
-                rs.AddArray(A, B, C);
+                Catenary A = new Catenary(150*Vector2.UnitY, 400, 12, 0.75, 3000);
+                Catenary B = new Catenary(A.EndPosition, 1400, -10, 0.75, 3000);
+                Catenary C = new Catenary(B.EndPosition, 700, -20, 0.75, 3000);
+                rs.AddSpans(A, B, C);
             }
 
 
@@ -114,8 +114,7 @@ namespace JA.CatenarySpans
                 //Allow runtime usage.
             }
             */
-
-
+            
             if (LicenseManager.Validate(typeof(CatenaryForm), this) is ComponentLicense lic)
             {
                 _isDemo = lic.IsDemo;
@@ -149,19 +148,11 @@ namespace JA.CatenarySpans
         {
             get
             {
-                ProjectUnitSystem sys=ProjectUnitSystem.FeetPoundSecond;
-                try
+                if (Enum.TryParse(Properties.Settings.Default.projectUnits, true, out ProjectUnitSystem system))
                 {
-                    sys=(ProjectUnitSystem)Enum.Parse(typeof(ProjectUnitSystem),
-                        Properties.Settings.Default.projectUnits, true);
+                    return new ProjectUnits(system);
                 }
-                catch (ArgumentException arg)
-                {
-                    Debug.WriteLine(arg.ToString());
-                    Properties.Settings.Default.projectUnits=sys.ToString();
-                }
-
-                return new ProjectUnits(sys);
+                return new ProjectUnits(ProjectUnitSystem.FeetPoundSecond);
             }
         }
 

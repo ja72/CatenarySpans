@@ -44,7 +44,7 @@ namespace JA
         /// <summary>
         /// Vector from polar coordinates.
         /// </summary>
-        /// <param name="r">The distance frrom the origin (radius)</param>
+        /// <param name="r">The distance from the origin (radius)</param>
         /// <param name="θ">The angle from horizontal in radians</param>
         /// <returns>A vector</returns>
         public static Vector2 Polar(double r, double θ)
