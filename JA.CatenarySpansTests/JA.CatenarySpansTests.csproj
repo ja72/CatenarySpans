@@ -71,6 +71,10 @@
       <Project>{15D5CC6C-0329-4602-A4A7-9EA6743BE27E}</Project>
       <Name>JA.CatenarySpans</Name>
     </ProjectReference>
+    <ProjectReference Include="..\JA.CatenarySpansLib\JA.CatenarySpansLib.csproj">
+      <Project>{c6af1282-0632-4a33-80d6-561914d6494e}</Project>
+      <Name>JA.CatenarySpansLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

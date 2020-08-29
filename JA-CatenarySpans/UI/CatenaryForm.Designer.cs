@@ -1,4 +1,4 @@
-﻿namespace JA.CatenarySpans
+﻿namespace JA.UI
 {
     partial class CatenaryForm
     {

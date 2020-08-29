@@ -5,10 +5,11 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
 using System.Windows.Forms;
-using JA.Gdi;
 
-namespace JA.Printing
+namespace JA.UI
 {
+    using JA.Engineering;
+
     /// <summary>
     /// When implemented, 2D objects can draw themselves on a print output via the <see cref="PrintDoc"/> class.
     /// </summary>
@@ -22,22 +23,19 @@ namespace JA.Printing
 
     public class PrintDoc : System.Drawing.Printing.PrintDocument
     {
-        List<IPrintable> items;
         int index;
         bool split;
         float split_y;
         PointF pos;
-        PrintDialog pd;
-        PrintPreviewDialog pp;
 
         public PrintDoc()
         {
             this.BeginPrint+=new PrintEventHandler(PrintDoc_BeginPrint);
             this.PrintPage+=new System.Drawing.Printing.PrintPageEventHandler(PrintDoc_PrintPage);
 
-            this.items=new List<IPrintable>();
+            this.Items=new List<IPrintable>();
 
-            pd = new PrintDialog
+            PrintDialogBox = new PrintDialog
             {
                 Document = this,
                 ShowNetwork = true,
@@ -49,12 +47,12 @@ namespace JA.Printing
                 ShowHelp = true
             };
 
-            pp = new PrintPreviewDialog
+            PrintPreviewDialogBox = new PrintPreviewDialog
             {
                 Document = this
             };
-            pp.Scale(new SizeF(1.4f, 1.4f));
-            pp.Load+=new EventHandler(m_pp_Load);
+            PrintPreviewDialogBox.Scale(new SizeF(1.4f, 1.4f));
+            PrintPreviewDialogBox.Load+=new EventHandler(m_pp_Load);
 
         }
 
@@ -79,7 +77,7 @@ namespace JA.Printing
             {
                 pos.Y-=split_y;
             }
-            if(items.Count==0)
+            if(Items.Count==0)
             {
                 e.HasMorePages=false;
                 return;
@@ -87,7 +85,7 @@ namespace JA.Printing
             do
             {
                 PointF start=pos;
-                item=items[index];
+                item=Items[index];
                 SizeF sz=item.GetSize(e.Graphics, e.MarginBounds, pos);
                 if(item.Alignment==HorizontalAlignment.Right)
                 {
@@ -114,39 +112,39 @@ namespace JA.Printing
                 }
                 pos.Y+=sz.Height;
 
-            } while(index<items.Count&&pos.Y<e.MarginBounds.Bottom);
+            } while(index<Items.Count&&pos.Y<e.MarginBounds.Bottom);
 
-            e.HasMorePages=index<items.Count;
+            e.HasMorePages=index<Items.Count;
         }
 
         public void AddText(string text, Font font) { AddText(text, font, new StringFormat()); }
         public void AddText(string text, Font font, StringFormat sf)
         {
-            items.Add(new TextLine(text, font, sf));
+            Items.Add(new TextLine(text, font, sf));
         }
 
         public void AddParagraph(string text, Font f, Color col, bool draw_border)
         {
-            items.Add(new Paragraph(text, f, col, draw_border));
+            Items.Add(new Paragraph(text, f, col, draw_border));
         }
 
         public void Add(IPrintable item)
         {
-            items.Add(item);
+            Items.Add(item);
         }
 
         public void AddLine()
         {
-            items.Add(new EmptyLine());
+            Items.Add(new EmptyLine());
         }
         public void AddHorizLine()
         {
-            items.Add(new HorizontalLine());
+            Items.Add(new HorizontalLine());
         }
 
         public void AddPicture(Image image)
         {
-            items.Add(new Picture(image));
+            Items.Add(new Picture(image));
         }
 
         public bool PrintInColor
@@ -157,7 +155,7 @@ namespace JA.Printing
 
         public void PrintDialog()
         {
-            if(pd.ShowDialog()==DialogResult.OK)
+            if(PrintDialogBox.ShowDialog()==DialogResult.OK)
             {
                 Print();
             }
@@ -165,9 +163,9 @@ namespace JA.Printing
 
         public void PrintPreviewDialog()
         {
-            if(pd.ShowDialog()==DialogResult.OK)
+            if(PrintDialogBox.ShowDialog()==DialogResult.OK)
             {
-                pp.ShowDialog();
+                PrintPreviewDialogBox.ShowDialog();
             }
         }
 
@@ -177,6 +175,10 @@ namespace JA.Printing
             set { DefaultPageSettings.Landscape=value; }
         }
 
+        public List<IPrintable> Items { get; }
 
+        public PrintDialog PrintDialogBox { get; }
+
+        public PrintPreviewDialog PrintPreviewDialogBox { get; }
     }
 }

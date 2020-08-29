@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JA.Gdi
+namespace JA.UI
 {
     public static class GdiEx
     {

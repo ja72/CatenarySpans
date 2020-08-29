@@ -6,7 +6,7 @@ using System.Text;
 
 namespace JA
 {
-    public static class Ex
+    public static class Extensions
     {
         public static TEnum Parse<TEnum>(this string value, bool ignoreCase) where TEnum : struct
         {

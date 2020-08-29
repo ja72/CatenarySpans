@@ -6,11 +6,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using JA.Engineering;
-using JA.Gdi;
 
-namespace JA.CatenarySpans
+namespace JA.UI
 {
+    using JA.Engineering;
+
     public partial class TensionForm : Form
     {
         public TensionForm()
@@ -92,10 +92,10 @@ namespace JA.CatenarySpans
         {
             var img=new Bitmap(Size.Width, Size.Height);
             this.DrawToBitmap(img, new Rectangle(Point.Empty, Size));
-            var doc=new JA.Printing.PrintDoc();
-            var draw=new JA.Printing.Picture(img) { FitToPage=true, Caption="Tension Properties" };
+            var doc=new PrintDoc();
+            var draw=new Picture(img) { FitToPage=true, Caption="Tension Properties" };
             doc.Add(draw);
-            var dlg = new JA.Printing.PrintPreviewAndSettings
+            var dlg = new PrintPreviewAndSettings
             {
                 Document = doc,
                 StartPosition = FormStartPosition.CenterParent

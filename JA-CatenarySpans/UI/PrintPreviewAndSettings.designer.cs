@@ -1,4 +1,4 @@
-﻿namespace JA.Printing
+﻿namespace JA.UI
 {
     partial class PrintPreviewAndSettings
     {
@@ -41,7 +41,7 @@
             this.bt100 = new System.Windows.Forms.ToolStripMenuItem();
             this.bt150 = new System.Windows.Forms.ToolStripMenuItem();
             this.txtZoom = new System.Windows.Forms.ToolStripTextBox();
-            this.doc = new JA.Printing.PrintDoc();
+            this.doc = new PrintDoc();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.ts.SuspendLayout();

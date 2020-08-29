@@ -85,7 +85,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>ja.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\ja.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -103,52 +103,39 @@
     <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArrayEx.cs" />
     <Compile Include="ComponentLicense.cs" />
     <Compile Include="ComponentLicenseProvider.cs" />
     <Compile Include="CRC.cs" />
-    <Compile Include="Engineering\ItemList.cs" />
-    <Compile Include="CatenarySpans\CatenaryTable.cs" />
-    <Compile Include="Engineering\Cable.cs" />
-    <Compile Include="Engineering\CatenaryCalculator.cs" />
-    <Compile Include="Double.cs" />
-    <Compile Include="Engineering\Catenary.cs" />
-    <Compile Include="CatenarySpans\CatenaryForm.cs">
+    <Compile Include="UI\CatenaryTable.cs" />
+    <Compile Include="UI\CatenaryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CatenarySpans\CatenaryForm.Designer.cs">
+    <Compile Include="UI\CatenaryForm.Designer.cs">
       <DependentUpon>CatenaryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CatenarySpans\CatenaryGraphics.cs" />
-    <Compile Include="Engineering\EngValue.cs" />
-    <Compile Include="Engineering\Material.cs" />
-    <Compile Include="Engineering\ProjectUnits.cs" />
-    <Compile Include="Engineering\RulingSpan.cs" />
-    <Compile Include="Engineering\Span.cs" />
-    <Compile Include="Engineering\Unit.cs" />
-    <Compile Include="Ex.cs" />
-    <Compile Include="Gdi\Colors.cs" />
-    <Compile Include="Gdi\Canvas.cs" />
-    <Compile Include="Gdi\GdiEx.cs" />
+    <Compile Include="UI\CatenaryGraphics.cs" />
+    <Compile Include="UI\Extensions.cs" />
+    <Compile Include="UI\Colors.cs" />
+    <Compile Include="UI\Canvas.cs" />
+    <Compile Include="UI\GdiEx.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="IntRange.cs" />
-    <Compile Include="Printing\Printables.cs" />
-    <Compile Include="Printing\PrintDoc.cs">
+    <Compile Include="UI\Printables.cs" />
+    <Compile Include="UI\PrintDoc.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Printing\PrintPreviewAndSettings.cs">
+    <Compile Include="UI\PrintPreviewAndSettings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Printing\PrintPreviewAndSettings.designer.cs">
+    <Compile Include="UI\PrintPreviewAndSettings.designer.cs">
       <DependentUpon>PrintPreviewAndSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="CatenarySpans\CatenaryForm.resx">
+    <EmbeddedResource Include="UI\CatenaryForm.resx">
       <DependentUpon>CatenaryForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Printing\PrintPreviewAndSettings.resx">
+    <EmbeddedResource Include="UI\PrintPreviewAndSettings.resx">
       <DependentUpon>PrintPreviewAndSettings.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -157,7 +144,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="CatenarySpans\TensionForm.resx">
+    <EmbeddedResource Include="UI\TensionForm.resx">
       <DependentUpon>TensionForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -169,7 +156,6 @@
     <Content Include="CatenaryForm.lic">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Engineering\CatebaryDiagram.cd" />
     <None Include="ja.snk" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -180,14 +166,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Gdi\Style.cs" />
-    <Compile Include="CatenarySpans\TensionForm.cs">
+    <Compile Include="UI\Style.cs" />
+    <Compile Include="UI\TensionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CatenarySpans\TensionForm.Designer.cs">
+    <Compile Include="UI\TensionForm.Designer.cs">
       <DependentUpon>TensionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Vector2.cs" />
     <None Include="small_2.spanx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -335,6 +320,12 @@
       <Progid>1001</Progid>
       <DefaultIcon>Chart2.ico</DefaultIcon>
     </FileAssociation>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JA.CatenarySpansLib\JA.CatenarySpansLib.csproj">
+      <Project>{c6af1282-0632-4a33-80d6-561914d6494e}</Project>
+      <Name>JA.CatenarySpansLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

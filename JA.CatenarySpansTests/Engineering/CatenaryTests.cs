@@ -99,15 +99,15 @@ namespace JA.Engineering.Tests
             Assert.AreEqual(770, c.HorizontalTension);
 
             Assert.AreEqual(669.5652, c.CatenaryConstant, 1e-4);
-            CollectionAssert.AreEqual(new Vector2(54.832, 98.815), c.SagPoint, Ex.AbsComparer(1e-3));
+            CollectionAssert.AreEqual(new Vector2(54.832, 98.815), c.SagPoint, Extensions.AbsComparer(1e-3));
             Assert.AreEqual(98.8149, c.Clearance, 1e-4);
-            CollectionAssert.AreEqual(new Vector2(-770, 45.833), c.StartTension, Ex.AbsComparer(1e-3));
-            CollectionAssert.AreEqual(new Vector2(770, 306.78), c.EndTension, Ex.AbsComparer(1e-3));
+            CollectionAssert.AreEqual(new Vector2(-770, 45.833), c.StartTension, Extensions.AbsComparer(1e-3));
+            CollectionAssert.AreEqual(new Vector2(770, 306.78), c.EndTension, Extensions.AbsComparer(1e-3));
             Assert.AreEqual(0.2240, c.Eta, 1e-4);
             Assert.AreEqual(0.8160, c.GeometricStrainPct, 1e-4);
             Assert.IsFalse(c.IsStartTowerUplift);
             Assert.IsFalse(c.IsEndTowerUplift);
-            CollectionAssert.AreEqual(new Vector2(54.832, 98.815), c.LowestPosition, Ex.AbsComparer(1e-3));
+            CollectionAssert.AreEqual(new Vector2(54.832, 98.815), c.LowestPosition, Extensions.AbsComparer(1e-3));
             Assert.AreEqual(17.1019, c.MaximumSag, 1e-4);
             Assert.AreEqual(17.1012, c.MidSag, 1e-4);
             Assert.AreEqual(306.6199, c.TotalLength, 1e-4);
@@ -153,7 +153,7 @@ namespace JA.Engineering.Tests
             c.SetClearancePoint(point);
             var x = point.X;
             var actual = new Vector2(x, c.CatenaryFunction(x));
-            CollectionAssert.AreEqual(point, actual, Ex.AbsComparer(1e-3));
+            CollectionAssert.AreEqual(point, actual, Extensions.AbsComparer(1e-3));
         }
 
         [TestMethod()]

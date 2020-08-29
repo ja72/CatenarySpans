@@ -7,6 +7,8 @@ using System.Text;
 
 namespace JA
 {
+    using JA.UI;
+
     static class Program
     {
         /// <summary>
@@ -17,7 +19,7 @@ namespace JA
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new JA.CatenarySpans.CatenaryForm());
+            Application.Run(new CatenaryForm());
         }
 
     }

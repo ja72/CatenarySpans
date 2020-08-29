@@ -4,33 +4,45 @@ using System.Text;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace JA.Gdi
+namespace JA.UI
 {
     /// <summary>
     /// Color space with red, green, blue
     /// </summary>
-    public struct ColorRGB
+    public readonly struct ColorRGB
     {
-        public double R, G, B, A;
+        public double R { get; }
+        public double G { get; }
+        public double B { get; }
+        public double A { get; }
+
+        public ColorRGB(double r, double g, double b)
+            : this(r, g, b, 1) { }
+        public ColorRGB(double r, double g, double b, double a) : this()
+        {
+            this.R=r;
+            this.G=g;
+            this.B=b;
+            this.A=a;
+        }
 
         #region Conversions
         public static implicit operator Color(ColorRGB rgb)
         {            
-            byte A=(byte)DoubleEx.ClampMinMax(rgb.A*255, 0,255);
-            byte R=(byte)DoubleEx.ClampMinMax(rgb.R*255, 0,255);
-            byte G=(byte)DoubleEx.ClampMinMax(rgb.G*255, 0,255);
-            byte B=(byte)DoubleEx.ClampMinMax(rgb.B*255, 0,255);
-            return Color.FromArgb(A, R, G, B);
+            return Color.FromArgb(
+                (byte)DoubleEx.ClampMinMax(rgb.A*255, 0, 255),
+                (byte)DoubleEx.ClampMinMax(rgb.R*255, 0, 255),
+                (byte)DoubleEx.ClampMinMax(rgb.G*255, 0, 255),
+                (byte)DoubleEx.ClampMinMax(rgb.B*255, 0, 255));
         }
         public static implicit operator ColorRGB(Color color)
         {
-            return new ColorRGB()
-            {
-                A=DoubleEx.ClampMinMax(color.A/255.0, 0, 1),
-                R=DoubleEx.ClampMinMax(color.R/255.0, 0, 1),
-                G=DoubleEx.ClampMinMax(color.G/255.0, 0, 1),
-                B=DoubleEx.ClampMinMax(color.B/255.0, 0, 1)
-            };
+            return new ColorRGB(
+                DoubleEx.ClampMinMax(color.R/255.0, 0, 1),
+                DoubleEx.ClampMinMax(color.G/255.0, 0, 1),
+                DoubleEx.ClampMinMax(color.B/255.0, 0, 1),
+                DoubleEx.ClampMinMax(color.A/255.0, 0, 1)
+            );
         }
         #endregion
 
@@ -38,23 +50,11 @@ namespace JA.Gdi
 
         public ColorRGB MoreOpaque(double amount) //opacify ??
         {
-            return new ColorRGB()
-            {
-                A=(1-amount)*A,
-                R=R,
-                G=G,
-                B=B
-            };
+            return new ColorRGB(R, G, B, (1-amount)*A);
         }
         public ColorRGB LessOpaque(double amount) //translucify ??
         {
-            return new ColorRGB()
-            {
-                A=A+amount*(1-A),
-                R=R,
-                G=G,
-                B=B
-            };
+            return new ColorRGB(R, G, B, A+amount*(1-A));
         }
 
         public ColorRGB RotateAboutRed(double amount)
@@ -62,39 +62,21 @@ namespace JA.Gdi
             double c=DoubleEx.CosCircle(amount);
             double s=DoubleEx.SinCircle(amount);
 
-            return new ColorRGB()
-            {
-                A=A,
-                R=R,
-                G=c*G-s*B,
-                B=s*G+c*B
-            };
+            return new ColorRGB(R, c*G-s*B, s*G+c*B, A);
         }
         public ColorRGB RotateAboutGreen(double amount)
         {
             double c=DoubleEx.CosCircle(amount);
             double s=DoubleEx.SinCircle(amount);
 
-            return new ColorRGB()
-            {
-                A=A,
-                R=c*R+s*B,
-                G=G,
-                B=-s*R+c*B
-            };
+            return new ColorRGB(c*R+s*B, G, -s*R+c*B, A);
         }
         public ColorRGB RotateAboutBlue(double amount)
         {
             double c=DoubleEx.CosCircle(amount);
             double s=DoubleEx.SinCircle(amount);
 
-            return new ColorRGB()
-            {
-                A=A,
-                R=c*R-s*G,
-                G=s*R+c*G,
-                B=B
-            };
+            return new ColorRGB(c*R-s*G, s*R+c*G, B, A);
         }
 
         #endregion
@@ -103,9 +85,22 @@ namespace JA.Gdi
     /// <summary>
     /// Color space with cyan, magenta and yellow
     /// </summary>
-    public struct ColorCMY
+    public readonly struct ColorCMY
     {
-        public double C, M, Y, A;
+        public double C { get; }
+        public double M { get; }
+        public double Y { get; }
+        public double Z { get; }
+
+        public ColorCMY(double c, double m, double y)
+            : this(c, m, y, 1) { }
+        public ColorCMY(double c, double m, double y, double z) : this()
+        {
+            this.C=c;
+            this.M=m;
+            this.Y=y;
+            this.Z=z;
+        }
 
         #region Conversions
 
@@ -121,24 +116,22 @@ namespace JA.Gdi
 
         public static implicit operator ColorRGB(ColorCMY cmy)
         {
-            return new ColorRGB()
-            {
-                R=-cmy.C+cmy.M+cmy.Y,
-                G=cmy.C+cmy.M-cmy.Y,
-                B=cmy.C-cmy.M+cmy.Y,
-                A=cmy.A
-            };
+            return new ColorRGB(            
+                -cmy.C+cmy.M+cmy.Y,
+                cmy.C+cmy.M-cmy.Y,
+                cmy.C-cmy.M+cmy.Y,
+                cmy.Z
+            );
         }
 
         public static implicit operator ColorCMY(ColorRGB rgb)
         {
-            return new ColorCMY()
-            {
-                C=(rgb.G+rgb.B)/2,
-                M=(rgb.R+rgb.G)/2,
-                Y=(rgb.B+rgb.R)/2,
-                A=rgb.A
-            };
+            return new ColorCMY(
+                (rgb.G+rgb.B)/2,
+                (rgb.R+rgb.G)/2,
+                (rgb.B+rgb.R)/2,
+                rgb.A
+            );
         }
 
         #endregion
@@ -146,42 +139,24 @@ namespace JA.Gdi
         #region Adjustments
         public ColorCMY RotateAboutCyan(double amount)
         {
-            double c=DoubleEx.CosCircle(amount);
-            double s=DoubleEx.SinCircle(amount);
+            double cs=DoubleEx.CosCircle(amount);
+            double sn=DoubleEx.SinCircle(amount);
 
-            return new ColorCMY()
-            {
-                A=A,
-                C=C,
-                M=c*M-s*Y,
-                Y=s*M+c*Y
-            };
+            return new ColorCMY(C, cs*M-sn*Y, sn*M+cs*Y, Z);
         }
         public ColorCMY RotateAboutMagenta(double amount)
         {
-            double c=DoubleEx.CosCircle(amount);
-            double s=DoubleEx.SinCircle(amount);
+            double cs=DoubleEx.CosCircle(amount);
+            double sn=DoubleEx.SinCircle(amount);
 
-            return new ColorCMY()
-            {
-                A=A,
-                C=c*C+s*Y,
-                M=M,
-                Y=-s*C+c*Y
-            };
+            return new ColorCMY(cs*C+sn*Y, M, -sn*C+cs*Y, Z);
         }
         public ColorCMY RotateAboutYellow(double amount)
         {
-            double c=DoubleEx.CosCircle(amount);
-            double s=DoubleEx.SinCircle(amount);
+            double cs=DoubleEx.CosCircle(amount);
+            double sn=DoubleEx.SinCircle(amount);
 
-            return new ColorCMY()
-            {
-                A=A,
-                C=c*C-s*M,
-                M=s*C+c*M,
-                Y=Y
-            };
+            return new ColorCMY(cs*C-sn*M, sn*C+cs*M, Y, Z);
         }
 
         #endregion
@@ -190,12 +165,21 @@ namespace JA.Gdi
     /// <summary>
     /// Color space with hue, saturation, lightness
     /// </summary>
-    public struct ColorHSL
+    public readonly struct ColorHSL
     {
-        /// <summary>
-        /// Hue, Saturation, Lightness, Alpha
-        /// </summary>
-        public double H, S, L, A;
+        public ColorHSL(double h, double s, double l) : this(h, s, l, 1) { }
+        public ColorHSL(double h, double s, double l, double a) : this()
+        {
+            H=h;
+            S=s;
+            L=l;
+            A=a;
+        }
+
+        public double H { get; }
+        public double S { get;  }
+        public double L { get;  }
+        public double A { get; }
 
         #region Conversions
         public static implicit operator Color(ColorHSL hsl)
@@ -257,15 +241,13 @@ namespace JA.Gdi
                     }
                 }
             }
-
-
-            return new ColorRGB()
-            {
-                A=hsl.A,
-                R=x[0],
-                G=x[1],
-                B=x[2]
-            };
+            
+            return new ColorRGB(
+                x[0],
+                x[1],
+                x[2],
+                hsl.A
+            );
         }
         /// <summary>
         /// Convert RGB to HSL
@@ -320,13 +302,12 @@ namespace JA.Gdi
                 else { s=0; }
             }
             else { l=0; }
-            return new ColorHSL()
-            {
-                A=rgb.A,
-                H=h,
-                S=s,
-                L=l
-            };
+            return new ColorHSL(            
+                h,
+                s,
+                l,
+                rgb.A
+            );
         }
         public static implicit operator ColorHSL(Color color)
         {
@@ -343,13 +324,12 @@ namespace JA.Gdi
         /// <returns></returns>
         public ColorHSL Brighten(double amount)
         {
-            return new ColorHSL()
-            {
-                A=A,
-                H=H,
-                S=S,
-                L=L+amount*(1-L)
-            };
+            return new ColorHSL(            
+                H,
+                S,
+                L+amount*(1-L),
+                A
+            );
         }
         /// <summary>
         /// Darkens color such that amount=100% results in luminosity=0.0, and amount=0% does not change anything
@@ -358,73 +338,66 @@ namespace JA.Gdi
         /// <returns></returns>
         public ColorHSL Darken(double amount)
         {
-            return new ColorHSL()
-            {
-                A=A,
-                H=H,
-                S=S,
-                L=(1-amount)*L
-            };
+            return new ColorHSL(
+                H,
+                S,
+                (1-amount)*L,
+                A
+            );
         }
         public ColorHSL MoreOpaque(double amount)
         {
-            return new ColorHSL()
-            {
-                A=A+amount*(1-A),
-                H=H,
-                S=S,
-                L=L
-            };
+            return new ColorHSL(            
+                H,
+                S,
+                L,
+                A+amount*(1-A)
+            );
         }
         public ColorHSL LessOpaque(double amount)
         {
-            return new ColorHSL()
-            {
-                A=(1-amount)*A,
-                H=H,
-                S=S,
-                L=L
-            };
+            return new ColorHSL(            
+                H,
+                S,
+                L,
+                (1-amount)*A
+            );
         }
         public ColorHSL AddHue(double amount)
         {
-            return new ColorHSL()
-            {
-                A=A,
-                H=DoubleEx.WrapAround(H+amount, 0, 1),
-                S=S,
-                L=L
-            };
+            return new ColorHSL(
+                DoubleEx.WrapAround(H+amount, 0, 1),
+                S,
+                L,
+                A
+            );
         }
         public ColorHSL SubtractHue(double amount)
         {
-            return new ColorHSL()
-            {
-                A=A,
-                H=DoubleEx.WrapAround(H-amount, 0, 1),
-                S=S,
-                L=L
-            };
+            return new ColorHSL(            
+                DoubleEx.WrapAround(H-amount, 0, 1),
+                S,
+                L,
+                A
+            );
         }
         public ColorHSL Saturate(double amount)
         {
-            return new ColorHSL()
-            {
-                A=A,
-                H=H,
-                S=S+amount*(1-S),
-                L=L
-            };
+            return new ColorHSL(            
+                H,
+                S+amount*(1-S),
+                L,
+                A
+            );
         }
         public ColorHSL DeSaturate(double amount)
         {
-            return new ColorHSL()
-            {
-                A=A,
-                H=H,
-                S=(1-amount)*S,
-                L=L
-            };
+            return new ColorHSL(
+                H,
+                (1-amount)*S,
+                L,
+                A
+            );
         }
         #endregion
     }
@@ -485,7 +458,7 @@ namespace JA.Gdi
         }
         public static ColorRGB CreateRGB(double red, double green, double blue, double alpha)
         {
-            return new ColorRGB() { R=red, G=green, B=blue, A=alpha };
+            return new ColorRGB(red, green, blue, alpha );
         }
         public static ColorHSL CreateHSL(double hue)
         {
@@ -501,7 +474,7 @@ namespace JA.Gdi
         }
         public static ColorHSL CreateHSL(double hue, double saturation, double luminosty, float alpha)
         {
-            return new ColorHSL() { H=hue, S=saturation, L=luminosty, A=alpha };
+            return new ColorHSL(hue, saturation, luminosty, alpha );
         }
         public static ColorHSL Random()
         {
@@ -518,7 +491,7 @@ namespace JA.Gdi
         public static ColorHSL Random(double luminosity, double saturation, double alpha)
         {
             double h=RandomGenerator.NextDouble();
-            return new ColorHSL() { H=h, S=saturation, L=luminosity, A=alpha };
+            return new ColorHSL(h, saturation, luminosity, alpha );
         }
         public static Color RandomKnownColor()
         {

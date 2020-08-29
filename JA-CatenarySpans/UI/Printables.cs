@@ -5,7 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace JA.Printing
+namespace JA.UI
 {
 
     public class EmptyLine : IPrintable
@@ -56,33 +56,30 @@ namespace JA.Printing
 
     public class TextLine : IPrintable
     {
-        string text;
-        Font font;
-        StringFormat sf;
         HorizontalAlignment align;
 
         public TextLine(string text) : this(text, SystemFonts.DialogFont, new StringFormat()) { }
         public TextLine(string text, Font font, StringFormat sf)
         {
-            this.text=text;
-            this.font=font;
-            this.sf=sf;
+            this.Text=text;
+            this.Font=font;
+            this.Format=sf;
             this.align=HorizontalAlignment.Left;
         }
-        public string Text { get { return text; } set { text=value; } }
-        public Font Font { get { return font; } set { font=value; } }
-        public StringFormat Format { get { return sf; } set { sf=value; } }
+        public string Text { get; set; }
+        public Font Font { get; set; }
+        public StringFormat Format { get; set; }
 
         #region IPrintable Members
 
         public void Render(Graphics g, PointF pos, SizeF bounds)
         {
-            g.DrawString(text, font, Brushes.Black, pos, sf);
+            g.DrawString(Text, Font, Brushes.Black, pos, Format);
         }
 
         public SizeF GetSize(Graphics g, Rectangle page, PointF pos)
         {
-            return g.MeasureString(text, font, pos, sf);
+            return g.MeasureString(Text, Font, pos, Format);
         }
 
         public HorizontalAlignment Alignment
@@ -98,50 +95,44 @@ namespace JA.Printing
     public class Paragraph : IPrintable, IDisposable
     {
         bool is_disposed;
-        string text;
-        Font font;
-        Color color;
-        StringFormat sf;
-        bool border;
-        HorizontalAlignment align;
 
         public Paragraph(string text, Font font, Color color)
             : this(text, font, color, false) { }
 
         public Paragraph(string text, Font font, Color color, bool draw_border)
         {
-            this.text=text;
-            this.font=font;
-            this.color=color;
-            this.sf=new StringFormat(StringFormatFlags.NoWrap);     // default: StringFormatFlags.LineLimit
-            this.border=draw_border;
-            this.align=HorizontalAlignment.Left;
+            this.Text=text;
+            this.Font1=font;
+            this.Color1=color;
+            this.Format=new StringFormat(StringFormatFlags.NoWrap);     // default: StringFormatFlags.LineLimit
+            this.ShowBorder=draw_border;
+            this.Alignment=HorizontalAlignment.Left;
             this.is_disposed=false;
         }
-        public string Text { get { return text; } set { text=value; } }
+        public string Text { get; set; }
         public Font Font
         {
-            get { return font; }
+            get { return Font1; }
             set
             {
-                if(font!=value)
+                if(Font1!=value)
                 {
-                    font=value;
+                    Font1=value;
                 }
             }
         }
-        public Color Color { get { return color; } set { color=value; } }
-        public StringFormat Format { get { return sf; } set { sf=value; } }
-        public bool ShowBorder { get { return border; } set { border=value; } }
+        public Color Color { get { return Color1; } set { Color1=value; } }
+        public StringFormat Format { get; set; }
+        public bool ShowBorder { get; set; }
 
         #region IPrintable Members
 
         public void Render(System.Drawing.Graphics g, PointF pos, SizeF layout)
         {
-            using(Brush b=new SolidBrush(color))
+            using(Brush b=new SolidBrush(Color1))
             {
-                g.DrawString(text, font, b, new RectangleF(pos, layout), sf);
-                if(border)
+                g.DrawString(Text, Font1, b, new RectangleF(pos, layout), Format);
+                if(ShowBorder)
                 {
                     g.DrawRectangle(Pens.Blue, pos.X, pos.Y, layout.Width, layout.Height);
                 }
@@ -150,14 +141,13 @@ namespace JA.Printing
 
         public SizeF GetSize(System.Drawing.Graphics g, Rectangle page, PointF pos)
         {
-            return g.MeasureString(text, font, (int)(page.Right-pos.X), sf);
+            return g.MeasureString(Text, Font1, (int)(page.Right-pos.X), Format);
         }
 
-        public HorizontalAlignment Alignment
-        {
-            get { return align; }
-            set { align=value; }
-        }
+        public HorizontalAlignment Alignment { get; set; }
+
+        public Font Font1 { get; set; }
+        public Color Color1 { get; set; }
         #endregion
 
         #region IDisposable Members
@@ -175,8 +165,8 @@ namespace JA.Printing
                 if (disposing)
                 {
                     // dispose managed resourced here
-                    this.font.Dispose();
-                    this.sf.Dispose();
+                    this.Font1.Dispose();
+                    this.Format.Dispose();
                 }
             }
             is_disposed=true;
@@ -187,11 +177,9 @@ namespace JA.Printing
 
     public class Picture : IPrintable
     {
-        Image image;
-
         public Picture(Image image)
         {
-            this.image=image;
+            this.Image=image;
             this.Alignment=HorizontalAlignment.Center;
             this.FitToPage=true;
             this.Caption=string.Empty;
@@ -209,11 +197,11 @@ namespace JA.Printing
             RectangleF rect=new RectangleF(pos.X, pos.Y, bounds.Width, bounds.Height-sz.Height - 8);
             if(FitToPage)
             {
-                g.DrawImage(image, rect);
+                g.DrawImage(Image, rect);
             }
             else
             {
-                g.DrawImageUnscaledAndClipped(image, Rectangle.Round(rect));
+                g.DrawImageUnscaledAndClipped(Image, Rectangle.Round(rect));
             }
             if(!string.IsNullOrEmpty(Caption))
             {
@@ -236,20 +224,22 @@ namespace JA.Printing
             }
             if(FitToPage)
             {
-                float aspect=image.Height/(1f*image.Width);
+                float aspect=Image.Height/(1f*Image.Width);
                 float wt=page.Width+page.Left-pos.X;
                 float ht=aspect*wt;
                 return new SizeF(wt, ht+sz.Height + 8);
             }
             else
             {
-                return new SizeF(image.Width, image.Height + 8);
+                return new SizeF(Image.Width, Image.Height + 8);
             }
         }
 
         public HorizontalAlignment Alignment { get; set; }
         public bool FitToPage { get; set; }
         public string Caption { get; set; }
+
+        public Image Image { get; }
         #endregion
     }
 

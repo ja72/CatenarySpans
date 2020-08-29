@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		JA.ruleset = JA.ruleset
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JA.CatenarySpansLib", "JA.CatenarySpansLib\JA.CatenarySpansLib.csproj", "{C6AF1282-0632-4A33-80D6-561914D6494E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,18 @@ Global
 		{33798955-87B9-44B6-89D3-47AA9254DCA1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{33798955-87B9-44B6-89D3-47AA9254DCA1}.Release|x86.ActiveCfg = Release|Any CPU
 		{33798955-87B9-44B6-89D3-47AA9254DCA1}.Release|x86.Build.0 = Release|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Debug|x86.Build.0 = Debug|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Release|x86.ActiveCfg = Release|Any CPU
+		{C6AF1282-0632-4A33-80D6-561914D6494E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
